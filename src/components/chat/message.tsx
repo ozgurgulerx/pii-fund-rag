@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -21,12 +22,26 @@ export function Message({
   activeCitationId,
 }: MessageProps) {
   const isUser = message.role === "user";
+  // Prevent hydration mismatch with Framer Motion
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
+  // Use regular div during SSR, motion.div after hydration
+  const Container = isHydrated ? motion.div : "div";
+  const containerProps = isHydrated
+    ? {
+        initial: { opacity: 0, y: 10 },
+        animate: { opacity: 1, y: 0 },
+        transition: { duration: 0.2 },
+      }
+    : {};
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.2 }}
+    <Container
+      {...containerProps}
       className={cn("flex gap-3 py-4", isUser ? "flex-row-reverse" : "flex-row")}
     >
       {/* Avatar */}
@@ -94,7 +109,7 @@ export function Message({
           </Badge>
         )}
       </div>
-    </motion.div>
+    </Container>
   );
 }
 

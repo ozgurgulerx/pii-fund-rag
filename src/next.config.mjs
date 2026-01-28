@@ -9,9 +9,13 @@ const nextConfig = {
   async headers() {
     return [
       {
-        // Apply to all routes
-        source: "/:path*",
+        // HTML pages - no cache to ensure fresh content
+        source: "/((?!_next|api).*)",
         headers: [
+          {
+            key: "Cache-Control",
+            value: "no-cache, no-store, must-revalidate",
+          },
           {
             key: "Content-Security-Policy",
             value: [
@@ -25,6 +29,16 @@ const nextConfig = {
               "base-uri 'self'",
               "form-action 'self'",
             ].join("; "),
+          },
+        ],
+      },
+      {
+        // API routes
+        source: "/api/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "no-cache, no-store, must-revalidate",
           },
         ],
       },
