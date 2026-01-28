@@ -256,7 +256,7 @@ az webapp log tail --name fundrag-frontend --resource-group rg-fund-rag
 curl https://fundrag-frontend.azurewebsites.net/api/pii -X POST -H "Content-Type: application/json" -d '{"text":"test"}'
 
 # 3. Check PII container
-curl -X POST "http://4.157.124.30:5000/language/:analyze-text?api-version=2023-04-01" \
+curl -X POST "http://pii-ozguler.eastus.azurecontainer.io:5000/language/:analyze-text?api-version=2023-04-01" \
   -H "Content-Type: application/json" \
   -d '{"kind":"PiiEntityRecognition","parameters":{"modelVersion":"latest"},"analysisInput":{"documents":[{"id":"1","language":"en","text":"SSN 123-45-6789"}]}}'
 
@@ -327,7 +327,7 @@ App Service (fundrag-frontend)
 ├── WEBSITE_VNET_ROUTE_ALL: 1 (route ALL traffic through VNet)
 └── Outbound to:
     ├── AKS Internal LB: 10.0.0.10:80 (via VNet)
-    ├── PII Container: 4.157.124.30:5000 (via VNet → Internet)
+    ├── PII Container: pii-ozguler.eastus.azurecontainer.io:5000 (via VNet → Internet)
     └── Azure OpenAI: aoai-ep-swedencentral02 (via VNet → Internet)
 
 AKS Cluster (aks-fund-rag)
@@ -381,7 +381,8 @@ Before deploying, verify:
 
 - [ ] `BACKEND_URL` set to internal LoadBalancer IP (`http://10.0.0.10`)
 - [ ] `WEBSITE_VNET_ROUTE_ALL=1` enabled
-- [ ] `PII_ENDPOINT` set to PII container (`http://4.157.124.30:5000`)
+- [ ] `PII_ENDPOINT` set to PII container (`http://pii-ozguler.eastus.azurecontainer.io:5000`)
+  - ⚠️ **ALWAYS use DNS name, NOT IP address!** ACI IPs can change on restart/redeploy
 - [ ] `PORT=3000` and `WEBSITES_PORT=3000` configured
 - [ ] AKS pods running: `kubectl get pods -n fund-rag`
 - [ ] Internal LoadBalancer has IP: `kubectl get svc fund-rag-backend-internal -n fund-rag`
