@@ -9,10 +9,16 @@ on:
       - 'src/lib/**'
       - 'src/hooks/**'
       - 'src/types/**'
+      - 'src/data/**'
       - 'src/package.json'
-      - 'src/next.config.ts'
+      - 'src/next.config.mjs'
       - 'src/tailwind.config.ts'
   workflow_dispatch:
+
+# Required for OIDC authentication
+permissions:
+  id-token: write
+  contents: read
 
 env:
   AZURE_WEBAPP_NAME: fundrag-frontend
@@ -39,37 +45,64 @@ jobs:
 
       - name: Build application
         working-directory: ./src
-        env:
-          NEXT_PUBLIC_API_URL: ${{ secrets.BACKEND_API_URL }}
-          AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
-          AZURE_OPENAI_ENDPOINT: ${{ secrets.AZURE_OPENAI_ENDPOINT }}
-          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
-          PII_ENDPOINT: ${{ secrets.PII_ENDPOINT }}
         run: npm run build
 
-      - name: Login to Azure
+      - name: Login to Azure (OIDC)
         uses: azure/login@v2
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Prepare deployment package
+        working-directory: ./src
+        run: |
+          # Create deployment directory
+          mkdir -p /tmp/deploy/.next
+
+          # Copy standalone server files (handle nested path structure)
+          STANDALONE_PATH=$(find .next/standalone -name "server.js" -path "*/src/server.js" | head -1 | xargs dirname)
+          cp "$STANDALONE_PATH/server.js" /tmp/deploy/
+          cp "$STANDALONE_PATH/package.json" /tmp/deploy/
+          cp -r "$STANDALONE_PATH/node_modules" /tmp/deploy/
+          cp -r "$STANDALONE_PATH/.next"/* /tmp/deploy/.next/ 2>/dev/null || true
+
+          # Copy static files
+          cp -r .next/static /tmp/deploy/.next/static
+
+          # Create public directory
+          mkdir -p /tmp/deploy/public
+          cp -r public/* /tmp/deploy/public/ 2>/dev/null || true
+
+          # Create zip
+          cd /tmp/deploy && zip -r /tmp/app.zip .
+
+          echo "Deployment package contents:"
+          ls -la /tmp/deploy/
+          ls -la /tmp/deploy/.next/
 
       - name: Deploy to Azure App Service
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          package: ./src/.next/standalone
-
-      - name: Deploy static files
         run: |
-          az webapp deploy --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+          az webapp deploy \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
             --name ${{ env.AZURE_WEBAPP_NAME }} \
-            --src-path ./src/.next/static \
-            --target-path /home/site/wwwroot/.next/static \
-            --type static
+            --src-path /tmp/app.zip \
+            --type zip \
+            --restart true
 
-      - name: Deploy public files
+      - name: Verify deployment
         run: |
-          az webapp deploy --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
-            --name ${{ env.AZURE_WEBAPP_NAME }} \
-            --src-path ./src/public \
-            --target-path /home/site/wwwroot/public \
-            --type static
+          echo "Waiting for app to start..."
+          sleep 30
+
+          # Test PII endpoint
+          RESPONSE=$(curl -s -X POST "https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net/api/pii" \
+            -H "Content-Type: application/json" \
+            -d '{"text":"test"}' \
+            -m 30)
+
+          if echo "$RESPONSE" | grep -q "blocked"; then
+            echo "✅ Deployment verified - PII API responding"
+          else
+            echo "⚠️ Warning: Unexpected response: $RESPONSE"
+          fi
