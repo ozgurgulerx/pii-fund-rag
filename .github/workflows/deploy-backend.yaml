@@ -16,6 +16,11 @@ on:
       - 'k8s/**'
   workflow_dispatch:
 
+# Required for OIDC authentication
+permissions:
+  id-token: write
+  contents: read
+
 env:
   AZURE_CONTAINER_REGISTRY: aistartuptr.azurecr.io
   IMAGE_NAME: fund-rag-backend
@@ -30,10 +35,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Login to Azure
+      - name: Login to Azure (OIDC)
         uses: azure/login@v2
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Login to Azure Container Registry
         run: az acr login --name aistartuptr
@@ -52,16 +59,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Login to Azure
+      - name: Login to Azure (OIDC)
         uses: azure/login@v2
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Get AKS credentials
         run: az aks get-credentials --resource-group ${{ env.AKS_RESOURCE_GROUP }} --name ${{ env.AKS_CLUSTER }}
 
       - name: Create namespace if not exists
         run: kubectl apply -f k8s/namespace.yaml
+
+      - name: Apply backend service
+        run: kubectl apply -f k8s/backend-service.yaml
 
       - name: Create/Update secrets
         run: |
@@ -76,7 +88,6 @@ jobs:
         run: |
           kubectl apply -f k8s/backend-configmap.yaml
           kubectl apply -f k8s/backend-deployment.yaml
-          kubectl apply -f k8s/backend-ingress.yaml
 
       - name: Update deployment image
         run: |
@@ -86,3 +97,10 @@ jobs:
 
       - name: Wait for rollout
         run: kubectl rollout status deployment/fund-rag-backend --namespace=${{ env.NAMESPACE }} --timeout=300s
+
+      - name: Verify deployment
+        run: |
+          echo "Checking pod status..."
+          kubectl get pods -n ${{ env.NAMESPACE }} -l app=fund-rag-backend
+          echo "Checking service..."
+          kubectl get svc -n ${{ env.NAMESPACE }}
