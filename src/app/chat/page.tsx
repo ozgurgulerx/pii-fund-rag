@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+// Build timestamp: 2026-01-28T12:10:00Z - forces chunk regeneration
+import { useState, useCallback } from "react";
 import { Sidebar } from "@/components/layout/sidebar";
 import { SourcesPanel } from "@/components/layout/sources-panel";
 import { ChatThread } from "@/components/chat/chat-thread";
