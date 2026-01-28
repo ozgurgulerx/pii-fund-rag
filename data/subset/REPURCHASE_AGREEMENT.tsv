@@ -1,0 +1,362 @@
+HOLDING_ID	TRANSACTION_TYPE	IS_CLEARED	CENTRAL_COUNTER_PARTY	IS_TRIPARTY	REPURCHASE_RATE	MATURITY_DATE
+159342764	Reverse repurchase	N		N	4.05	19-SEP-2027
+160483935	Repurchase	N		Y	4.13	03-NOV-2025
+159174015	Repurchase	N		N	3.9	
+159303824	Repurchase	N		N	4.08	02-OCT-2025
+159368167	Reverse repurchase	N		N	4.32	14-OCT-2025
+159341729	Reverse repurchase	N		N	4.31	03-OCT-2025
+159187340	Reverse repurchase	N		N	4.28	01-OCT-2025
+159181138	Repurchase	N		N	3.9	31-OCT-2025
+159086224	Repurchase	N		Y	4.2	01-OCT-2025
+158170583	Repurchase	N		Y	4.2	01-OCT-2025
+161041485	Repurchase	Y	Fixed Income Clearing Corp.	N	4.15	03-NOV-2025
+159174314	Reverse repurchase	N		N	4.25	
+158384611	Repurchase	N		Y	4.21	01-OCT-2025
+158982430	Repurchase	N		Y	4.22	01-OCT-2025
+159185956	Repurchase	N		N	1.65	
+159303532	Repurchase	N		N	4.19	16-OCT-2025
+159374742	Repurchase	N		N	4	01-OCT-2025
+160180384	Repurchase	N		Y	4.15	03-NOV-2025
+159303640	Repurchase	N		N	.15	03-DEC-2025
+159289629	Reverse repurchase	N		N	3.75	19-SEP-2027
+158712556	Repurchase	N		Y	4.2	01-OCT-2025
+159183187	Reverse repurchase	N		N	3.75	31-OCT-2025
+159183540	Repurchase	N		N	3.9	31-OCT-2025
+159183569	Reverse repurchase	N		N	4.25	
+159183964	Repurchase	N		N	3.91	31-OCT-2025
+156249748	Repurchase	N		Y	4.33	02-SEP-2025
+159271663	Reverse repurchase	N		N	4.75	31-OCT-2025
+159272016	Reverse repurchase	N		N	4.25	06-OCT-2025
+159345383	Reverse repurchase	N		N	2.25	19-SEP-2027
+159088297	Repurchase	Y	Fixed Income Clearing Corporation	N	1.65	01-OCT-2025
+159304033	Repurchase	N		N	4.29	01-OCT-2025
+159190054	Reverse repurchase	N		N	2	31-OCT-2025
+159370846	Reverse repurchase	N		N	4.31	14-OCT-2025
+160487487	Repurchase	N		Y	4.15	03-NOV-2025
+159172347	Repurchase	N		N	3.4	31-OCT-2025
+159186185	Reverse repurchase	N		N	4.38	01-OCT-2025
+159178233	Reverse repurchase	N		N	3.25	31-OCT-2025
+159346326	Reverse repurchase	N		N	3.95	19-SEP-2027
+160487612	Repurchase	N		Y	4.15	03-NOV-2025
+159173815	Repurchase	N		N	3.7	31-OCT-2025
+159189534	Repurchase	N		N	3.9	
+159184582	Repurchase	N		N	3.92	31-OCT-2025
+159341333	Reverse repurchase	N		N	-1.25	19-SEP-2027
+156626437	Repurchase	N		Y	4.91	09-FEB-2026
+158712579	Repurchase	N		Y	4.21	01-OCT-2025
+157922845	Repurchase	Y	BofA Securities, Inc.	N	4.26	14-OCT-2025
+159171776	Repurchase	N		N	3.9	31-OCT-2025
+159178201	Reverse repurchase	N		N	4.28	01-OCT-2025
+159171190	Reverse repurchase	N		N	4.3	01-OCT-2025
+159186350	Repurchase	N		N	3.75	
+159183283	Repurchase	N		N	3.9	
+159176404	Reverse repurchase	N		N	3.75	02-OCT-2025
+159303329	Repurchase	N		N	4.25	15-OCT-2025
+159303501	Repurchase	N		N	4.26	06-OCT-2025
+159303722	Repurchase	N		N	4.27	02-OCT-2025
+159184510	Reverse repurchase	N		N	4.17	01-OCT-2025
+159183079	Reverse repurchase	N		N	4.19	
+159178910	Repurchase	N		N	3.93	31-OCT-2025
+158982428	Repurchase	N		Y	4.2	01-OCT-2025
+159275372	Reverse repurchase	N		N	4.35	31-OCT-2025
+159343124	Reverse repurchase	N		N	4	31-OCT-2025
+159303681	Repurchase	N		N	4.21	07-OCT-2025
+156493470	Repurchase	N		N	4.18	02-SEP-2025
+159187822	Reverse repurchase	N		N	4.25	01-OCT-2025
+159170758	Repurchase	N		N	3.9	
+159164736	Repurchase	N		N	3.9	31-OCT-2025
+159163270	Repurchase	N		N	3.9	31-OCT-2025
+159184878	Repurchase	N		N	3.85	31-OCT-2025
+159181987	Reverse repurchase	N		N	3.5	
+158384609	Repurchase	N		Y	4.2	01-OCT-2025
+158384606	Repurchase	N		Y	4.2	01-OCT-2025
+156249578	Repurchase	N		Y	4.34	02-SEP-2025
+157910864	Repurchase	Y	Australia and New Zealand Banking Group	N	4.27	01-OCT-2025
+159737369	Repurchase	Y	Fixed Income Clearing Corp	N	3.75	01-OCT-2025
+159171495	Repurchase	N		N	3.9	
+160180387	Repurchase	N		Y	4.14	03-NOV-2025
+159304088	Repurchase	N		N	4.28	10-OCT-2025
+159304446	Repurchase	N		N	4.2	27-OCT-2025
+159185441	Reverse repurchase	N		N	4.15	31-OCT-2025
+159165931	Repurchase	N		N	3.92	02-OCT-2025
+159177385	Repurchase	N		N	3.9	31-OCT-2025
+157914073	Repurchase	Y	BofA Securities, Inc.	N	4.29	01-OCT-2025
+158982424	Repurchase	N		Y	4.21	01-OCT-2025
+159296336	Repurchase	N		N	4.22	30-JUL-2026
+160487447	Repurchase	N		Y	4.14	03-NOV-2025
+159166137	Reverse repurchase	N		N	4.24	31-OCT-2025
+159180435	Repurchase	N		N	3.9	31-OCT-2025
+159304107	Repurchase	N		N	4.28	02-OCT-2025
+159373489	Reverse repurchase	N		N	4.32	14-OCT-2025
+156397390	Repurchase	N		N	.0439	16-SEP-2025
+160180476	Repurchase	N		Y	4.14	03-NOV-2025
+159344627	Reverse repurchase	N		N	3.5	31-OCT-2025
+156390790	Repurchase	N		N	.0438	15-SEP-2025
+159298769	Reverse repurchase	N		N	1	22-JUL-2027
+159341237	Reverse repurchase	N		N	3	19-SEP-2027
+159342720	Reverse repurchase	N		N	4.05	19-SEP-2027
+159188301	Repurchase	N		N	3.9	
+159189404	Repurchase	N		N	3.9	31-OCT-2025
+159304187	Repurchase	N		N	4.2	15-OCT-2025
+159346316	Reverse repurchase	N		N	4.34	02-OCT-2025
+159342199	Reverse repurchase	N		N	4.05	31-OCT-2025
+158170599	Repurchase	N		Y	4.21	01-OCT-2025
+158170572	Repurchase	N		Y	4.2	01-OCT-2025
+158170566	Repurchase	N		Y	4.2	01-OCT-2025
+160483863	Repurchase	N		Y	4.16	03-NOV-2025
+160487556	Repurchase	N		Y	4.15	03-NOV-2025
+159390185	Repurchase	N		N	4.32	01-OCT-2025
+159172751	Reverse repurchase	N		N	4.26999999	01-OCT-2025
+159184780	Repurchase	N		N	3.9	
+159160499	Repurchase	N		N	1.6	
+161162598	Repurchase	Y	Fixed Income Clearing Corporation	N	3.88	31-MAY-2027
+159091549	Repurchase	N		Y	4.2	01-OCT-2025
+160180342	Repurchase	N		Y	4.15	03-NOV-2025
+157824687	Reverse repurchase	N		N	16.247992996	25-NOV-2025
+158712580	Repurchase	N		Y	4.2	01-OCT-2025
+159387380	Repurchase	N		N	4.29	01-OCT-2025
+159176172	Reverse repurchase	N		N	4.19	
+159178584	Repurchase	N		N	3.85	
+156249288	Repurchase	N		Y	4.34	02-SEP-2025
+156411350	Repurchase	N		N	.0442	02-SEP-2025
+159304540	Reverse repurchase	N		N	.00001	03-DEC-2025
+158170589	Repurchase	N		Y	4.2	01-OCT-2025
+160483658	Repurchase	N		Y	4.15	03-NOV-2025
+159304258	Repurchase	N		N	4.25	01-OCT-2025
+159303428	Repurchase	N		N	4.19	07-OCT-2025
+159304131	Repurchase	N		N	4.35	01-OCT-2025
+158712581	Repurchase	N		Y	4.22	01-OCT-2025
+159177659	Repurchase	N		N	3.9	
+159183726	Repurchase	N		N	3.9	
+158170545	Repurchase	N		Y	4.2	01-OCT-2025
+159303995	Repurchase	N		N	4.19	17-OCT-2025
+159303389	Repurchase	N		N	4.29	01-OCT-2025
+159268473	Reverse repurchase	N		N	1	19-SEP-2027
+159303560	Repurchase	N		N	4.29	01-OCT-2025
+159303475	Repurchase	N		N	4.2	27-OCT-2025
+156250167	Repurchase	N		Y	4.34	02-SEP-2025
+160483732	Repurchase	N		Y	4.14	03-NOV-2025
+158712554	Repurchase	N		Y	4.2	01-OCT-2025
+159180871	Reverse repurchase	N		N	4.25	
+159170725	Reverse repurchase	N		N	4.23	
+159303841	Repurchase	N		N	4.22	15-OCT-2025
+156251080	Repurchase	N		Y	4.33	02-SEP-2025
+156249399	Repurchase	N		Y	4.33	02-SEP-2025
+159185577	Reverse repurchase	N		N	4.25	
+159183877	Reverse repurchase	N		N	4.25	
+159189148	Reverse repurchase	N		N	4.24	
+159181570	Repurchase	N		N	3.9	
+159091548	Repurchase	N		Y	4.19	01-OCT-2025
+159345782	Reverse repurchase	N		N	4.15	19-SEP-2027
+158170578	Repurchase	N		Y	4.21	01-OCT-2025
+159304433	Repurchase	N		N	4.28	03-OCT-2025
+159304631	Repurchase	N		N	4.23	01-OCT-2025
+159183325	Repurchase	N		N	1.7	
+156187902	Repurchase	N		Y	4.34	02-SEP-2025
+160483646	Repurchase	N		Y	4.16	03-NOV-2025
+158712557	Repurchase	N		Y	4.21	01-OCT-2025
+159171658	Reverse repurchase	N		N	4.2	
+156249271	Repurchase	N		Y	4.35	02-SEP-2025
+159183920	Reverse repurchase	N		N	4.15	31-OCT-2025
+159184630	Repurchase	N		N	3.85	
+159188979	Reverse repurchase	N		N	3.5	
+159176649	Repurchase	N		N	3.92	02-OCT-2025
+159171726	Reverse repurchase	N		N	4.23	
+159180967	Reverse repurchase	N		N	4.24	31-OCT-2025
+156400240	Repurchase	N		N	.0444	02-SEP-2025
+159275638	Reverse repurchase	N		N	4.34	02-OCT-2025
+158170616	Repurchase	N		Y	4.21	01-OCT-2025
+160487475	Repurchase	N		Y	4.16	03-NOV-2025
+159183520	Repurchase	N		N	3.9	
+159167449	Repurchase	N		N	3.9	31-OCT-2025
+159177777	Repurchase	N		N	3.9	31-OCT-2025
+159164417	Repurchase	N		N	3.5	
+159346841	Reverse repurchase	N		N	1.75	19-SEP-2027
+159441389	Reverse repurchase	N		N	.000001	03-DEC-2025
+159303564	Repurchase	N		N	4.29	02-OCT-2025
+159180236	Repurchase	N		N	3.75	
+158170562	Repurchase	N		Y	4.21	01-OCT-2025
+159303936	Repurchase	N		N	4.27	06-OCT-2025
+159285222	Reverse repurchase	N		N	.000001	03-DEC-2025
+160487565	Repurchase	N		Y	4.17	03-NOV-2025
+159183571	Reverse repurchase	N		N	4.25	
+159182508	Repurchase	N		N	3.9	
+159180495	Repurchase	N		N	3.9	
+159303568	Repurchase	N		N	4.25	06-OCT-2025
+156250266	Repurchase	N		Y	4.33	02-SEP-2025
+158170595	Repurchase	N		Y	4.2	01-OCT-2025
+159181707	Repurchase	N		N	3.9	
+159346862	Reverse repurchase	N		N	3.85	19-SEP-2027
+159177509	Reverse repurchase	N		N	3.25	
+159371133	Reverse repurchase	N		N	4.32	14-OCT-2025
+156187876	Repurchase	N		Y	4.33	02-SEP-2025
+159341218	Reverse repurchase	N		N	4.35	01-OCT-2025
+158170551	Repurchase	N		Y	4.22	01-OCT-2025
+160483608	Repurchase	N		Y	4.14	03-NOV-2025
+159184211	Repurchase	N		N	3.9	
+159185495	Repurchase	N		N	3.92	02-OCT-2025
+159166736	Repurchase	N		N	3.9	
+159189833	Repurchase	N		N	1.65	
+159304307	Repurchase	N		N	4.22	14-OCT-2025
+156411665	Repurchase	N		N	.0439	02-SEP-2025
+156187896	Repurchase	N		Y	4.33	02-SEP-2025
+159346488	Reverse repurchase	N		N	3.9	30-SEP-2027
+160487454	Repurchase	N		Y	4.14	03-NOV-2025
+159160867	Repurchase	N		N	3.9	
+159368778	Reverse repurchase	N		N	4.3	14-OCT-2025
+159304501	Repurchase	N		N	4.26	08-OCT-2025
+158712573	Repurchase	N		Y	4.2	01-OCT-2025
+159185456	Repurchase	N		N	3.9	
+159086220	Repurchase	N		Y	4.19	01-OCT-2025
+159341843	Reverse repurchase	N		N	3.5	19-SEP-2027
+160483815	Repurchase	N		Y	4.15	03-NOV-2025
+159182822	Reverse repurchase	N		N	4.26999999	01-OCT-2025
+159170266	Repurchase	N		N	3.95	
+159185939	Reverse repurchase	N		N	3.45	31-OCT-2025
+160483583	Repurchase	N		Y	4.14	03-NOV-2025
+159173616	Repurchase	N		N	1.45	
+159794245	Repurchase	N		Y	4.2	01-OCT-2025
+159271525	Reverse repurchase	N		N	3.25	19-SEP-2027
+159185368	Repurchase	N		N	3.9	
+159179442	Repurchase	N		N	2.5	31-OCT-2025
+159165972	Repurchase	N		N	1.35	
+159795584	Repurchase	N		Y	4.2	01-OCT-2025
+158982325	Repurchase	N		Y	4.21	01-OCT-2025
+159091542	Repurchase	Y	Fixed Income Clearing Corporation	N	1.65	01-OCT-2025
+159086271	Repurchase	Y	Fixed Income Clearing Corporation	N	4.18	01-OCT-2025
+160180283	Repurchase	N		Y	4.16	03-NOV-2025
+161152906	Repurchase	Y	FICC	N	4.13	03-NOV-2025
+157912270	Reverse repurchase	Y	BofA Securities, Inc.	N	1.65	17-JUN-2027
+159189979	Reverse repurchase	N		N	4.28	01-OCT-2025
+159179413	Reverse repurchase	N		N	4.25	
+160483768	Repurchase	N		Y	4.14	03-NOV-2025
+157913569	Repurchase	Y	BofA Securities, Inc.	N	4.22	01-OCT-2025
+159176977	Repurchase	N		N	3.85	02-OCT-2025
+159178048	Repurchase	N		N	3.87	31-OCT-2025
+159165490	Repurchase	N		N	3.9	
+159171546	Repurchase	N		N	3.9	31-OCT-2025
+159275564	Reverse repurchase	N		N	3.8	31-OCT-2025
+159283224	Reverse repurchase	N		N	1	04-SEP-2027
+160487545	Repurchase	N		Y	4.14	03-NOV-2025
+159386305	Repurchase	N		N	4.29	01-OCT-2025
+159188745	Repurchase	N		N	3.98	
+158982431	Repurchase	N		Y	4.2	01-OCT-2025
+160483754	Repurchase	N		Y	4.17	03-NOV-2025
+159176723	Repurchase	N		N	1.95	
+159167208	Repurchase	N		N	3.9	31-OCT-2025
+159346596	Reverse repurchase	N		N	4.26	10-OCT-2025
+158170556	Repurchase	N		Y	4.21	01-OCT-2025
+159303762	Repurchase	N		N	4.29	01-OCT-2025
+159304204	Repurchase	N		N	4.45	01-OCT-2025
+159173334	Repurchase	N		N	3.91	
+159183690	Repurchase	N		N	3.9	31-OCT-2025
+159187770	Reverse repurchase	N		N	4.15	
+159165478	Repurchase	N		N	1.7	
+158981901	Repurchase	Y	Fixed Income Clearing Corporation	N	4.18	01-OCT-2025
+159176829	Repurchase	N		N	3.9	
+159187342	Repurchase	N		N	3.75	
+159187290	Repurchase	N		N	2.15	
+159188274	Reverse repurchase	N		N	4.22	01-OCT-2025
+159088806	Repurchase	Y	Fixed Income Clearing Corporation	N	4.18	01-OCT-2025
+156418935	Repurchase	N		N	.044	12-SEP-2025
+159276929	Reverse repurchase	N		N	3.75	19-SEP-2027
+158982432	Repurchase	N		Y	4.21	01-OCT-2025
+159185022	Reverse repurchase	N		N	3	
+156249866	Repurchase	N		Y	4.33	02-SEP-2025
+159303707	Repurchase	N		N	4.27	09-OCT-2025
+159304116	Repurchase	N		N	4.31	01-OCT-2025
+159272903	Reverse repurchase	N		N	4.05	19-SEP-2027
+158982423	Repurchase	N		Y	4.2	01-OCT-2025
+159171484	Repurchase	N		N	3.9	31-OCT-2025
+159187508	Repurchase	N		N	3.9	
+159346538	Reverse repurchase	N		N	4.05	19-SEP-2027
+159184691	Repurchase	N		N	3.9	31-OCT-2025
+159176283	Reverse repurchase	N		N	3.75	
+160483590	Repurchase	N		Y	4.14	03-NOV-2025
+159187967	Repurchase	N		N	3.92	02-OCT-2025
+159303906	Repurchase	N		N	4.25	06-OCT-2025
+156250239	Repurchase	N		Y	4.34	02-SEP-2025
+160180350	Repurchase	N		Y	4.16	03-NOV-2025
+159343381	Reverse repurchase	N		N	4.255	23-OCT-2025
+159186134	Repurchase	N		N	3.9	31-OCT-2025
+159438763	Repurchase	N		N	.15	03-DEC-2025
+159303286	Repurchase	Y	Fixed Income Clearing Corp	N	4.2	01-OCT-2025
+159303756	Repurchase	N		N	4.22	09-OCT-2025
+159188457	Repurchase	N		N	3.9	31-OCT-2025
+159189057	Reverse repurchase	N		N	4.28	01-OCT-2025
+159179363	Repurchase	N		N	3.9	
+159160777	Repurchase	N		N	3.9	
+159178957	Repurchase	N		N	3.8	31-OCT-2025
+159171076	Repurchase	N		N	3.5	
+159172313	Repurchase	N		N	1.7	
+159303466	Repurchase	N		N	4.19	08-OCT-2025
+159303989	Repurchase	N		N	4.26	14-OCT-2025
+159303413	Repurchase	N		N	4.22	01-OCT-2025
+159304570	Repurchase	N		N	4.24	20-OCT-2025
+158982326	Repurchase	N		Y	4.2	01-OCT-2025
+159341519	Reverse repurchase	N		N	4.55	01-OCT-2025
+159346613	Reverse repurchase	N		N	4.25	01-OCT-2025
+158170610	Repurchase	N		Y	4.22	01-OCT-2025
+160483883	Repurchase	N		Y	4.14	03-NOV-2025
+159172893	Repurchase	N		N	3.9	
+159189541	Repurchase	N		N	3.9	
+159181634	Repurchase	N		N	3.9	
+159794363	Repurchase	N		Y	4.19	01-OCT-2025
+159178694	Repurchase	N		N	3.9	
+159160607	Repurchase	N		N	1.55	31-OCT-2025
+159180696	Repurchase	N		N	3.9	31-OCT-2025
+159177060	Reverse repurchase	N		N	1.5	
+158982429	Repurchase	N		Y	4.21	01-OCT-2025
+159342210	Reverse repurchase	N		N	3.25	24-SEP-2027
+159304408	Repurchase	N		N	4.29	01-OCT-2025
+159303290	Repurchase	N		N	4.32	01-OCT-2025
+158982401	Repurchase	N		Y	4.2	01-OCT-2025
+159269649	Reverse repurchase	N		N	3.5	19-SEP-2027
+159086072	Repurchase	Y	Fixed Income Clearing Corporation	N	1.65	01-OCT-2025
+158170605	Repurchase	N		Y	4.2	01-OCT-2025
+160483945	Repurchase	N		Y	4.15	03-NOV-2025
+159174204	Repurchase	N		N	3.9	
+159168971	Repurchase	N		N	3.85	
+159178421	Reverse repurchase	N		N	3.5	31-OCT-2025
+159177604	Repurchase	N		N	3.65	31-OCT-2025
+159171177	Repurchase	N		N	3.9	
+159448082	Reverse repurchase	N		N	0	11-SEP-2027
+156492884	Repurchase	Y	Fixed Income Clearing Corp	N	4	02-SEP-2025
+159736539	Repurchase	N		N	4.2	01-OCT-2025
+159178938	Repurchase	N		N	3.9	
+159162713	Repurchase	N		N	3.9	31-OCT-2025
+159183039	Repurchase	N		N	3.93	31-OCT-2025
+159182673	Reverse repurchase	N		N	4.24	
+159187393	Reverse repurchase	N		N	4.22	01-OCT-2025
+159271031	Reverse repurchase	N		N	4.35	01-OCT-2025
+156395737	Repurchase	N		N	.0442	02-SEP-2025
+158712582	Repurchase	N		Y	4.21	01-OCT-2025
+159185562	Reverse repurchase	N		N	4.25	
+159343338	Reverse repurchase	N		N	4.15	24-SEP-2027
+159170910	Repurchase	N		N	3.9	
+156250183	Repurchase	N		Y	4.34	02-SEP-2025
+159185147	Repurchase	N		N	3.9	31-OCT-2025
+159182242	Repurchase	N		N	1.7	
+159160629	Reverse repurchase	N		N	4.24	01-OCT-2025
+159163762	Repurchase	N		N	3.8	
+159303518	Repurchase	N		N	4.24	16-OCT-2025
+159304602	Repurchase	N		N	4.25	01-OCT-2025
+156251197	Repurchase	N		Y	4.34	02-SEP-2025
+159346478	Reverse repurchase	N		N	2.5	31-OCT-2025
+160483761	Repurchase	N		Y	4.13	03-NOV-2025
+159179528	Repurchase	N		N	3.9	
+159165993	Repurchase	N		N	3.9	31-OCT-2025
+159795348	Repurchase	N		Y	4.18	01-OCT-2025
+156250055	Repurchase	N		Y	4.33	02-SEP-2025
+159091564	Repurchase	Y	Fixed Income Clearing Corporation	N	4.18	01-OCT-2025
+159343426	Reverse repurchase	N		N	4.25	17-OCT-2025
+159343939	Reverse repurchase	N		N	4.27	01-OCT-2025
+160483955	Repurchase	N		Y	4.15	03-NOV-2025
+159304227	Repurchase	N		N	4.28	02-OCT-2025
+159382875	Repurchase	N		N	2.56	03-OCT-2025
+159186808	Repurchase	N		N	3.87	31-OCT-2025
+159185567	Repurchase	N		N	1.94	
+159179089	Reverse repurchase	N		N	1.75	
+159303342	Repurchase	N		N	2.52	10-OCT-2025
+159367770	Reverse repurchase	N		N	4.32	14-OCT-2025
+156250786	Repurchase	N		Y	4.33	02-SEP-2025

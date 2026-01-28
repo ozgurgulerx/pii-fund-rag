@@ -1,0 +1,75 @@
+name: Deploy Frontend to App Service
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/app/**'
+      - 'src/components/**'
+      - 'src/lib/**'
+      - 'src/hooks/**'
+      - 'src/types/**'
+      - 'src/package.json'
+      - 'src/next.config.ts'
+      - 'src/tailwind.config.ts'
+  workflow_dispatch:
+
+env:
+  AZURE_WEBAPP_NAME: fundrag-frontend
+  AZURE_RESOURCE_GROUP: rg-fund-rag
+  NODE_VERSION: '20.x'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: src/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./src
+        run: npm ci
+
+      - name: Build application
+        working-directory: ./src
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.BACKEND_API_URL }}
+          AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
+          AZURE_OPENAI_ENDPOINT: ${{ secrets.AZURE_OPENAI_ENDPOINT }}
+          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+          PII_ENDPOINT: ${{ secrets.PII_ENDPOINT }}
+        run: npm run build
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy to Azure App Service
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          package: ./src/.next/standalone
+
+      - name: Deploy static files
+        run: |
+          az webapp deploy --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --name ${{ env.AZURE_WEBAPP_NAME }} \
+            --src-path ./src/.next/static \
+            --target-path /home/site/wwwroot/.next/static \
+            --type static
+
+      - name: Deploy public files
+        run: |
+          az webapp deploy --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --name ${{ env.AZURE_WEBAPP_NAME }} \
+            --src-path ./src/public \
+            --target-path /home/site/wwwroot/public \
+            --type static

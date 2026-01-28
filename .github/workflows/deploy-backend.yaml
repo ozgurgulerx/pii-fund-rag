@@ -1,0 +1,88 @@
+name: Deploy Backend to AKS
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/api_server.py'
+      - 'src/unified_retriever.py'
+      - 'src/query_router.py'
+      - 'src/sql_generator.py'
+      - 'src/pii_filter.py'
+      - 'src/foundry_agent_client.py'
+      - 'src/fund_rag_agent.py'
+      - 'requirements.txt'
+      - 'Dockerfile.backend'
+      - 'k8s/**'
+  workflow_dispatch:
+
+env:
+  AZURE_CONTAINER_REGISTRY: aistartuptr.azurecr.io
+  IMAGE_NAME: fund-rag-backend
+  AKS_CLUSTER: aks-fund-rag
+  AKS_RESOURCE_GROUP: rg-fund-rag
+  NAMESPACE: fund-rag
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Login to Azure Container Registry
+        run: az acr login --name aistartuptr
+
+      - name: Build and push Docker image
+        run: |
+          docker build -f Dockerfile.backend -t ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} .
+          docker tag ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          docker push ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          docker push ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Get AKS credentials
+        run: az aks get-credentials --resource-group ${{ env.AKS_RESOURCE_GROUP }} --name ${{ env.AKS_CLUSTER }}
+
+      - name: Create namespace if not exists
+        run: kubectl apply -f k8s/namespace.yaml
+
+      - name: Create/Update secrets
+        run: |
+          kubectl create secret generic backend-secrets \
+            --namespace=${{ env.NAMESPACE }} \
+            --from-literal=AZURE_OPENAI_API_KEY=${{ secrets.AZURE_OPENAI_API_KEY }} \
+            --from-literal=AZURE_SEARCH_ADMIN_KEY=${{ secrets.AZURE_SEARCH_ADMIN_KEY }} \
+            --from-literal=PGPASSWORD=${{ secrets.PGPASSWORD }} \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Deploy to AKS
+        run: |
+          kubectl apply -f k8s/backend-configmap.yaml
+          kubectl apply -f k8s/backend-deployment.yaml
+          kubectl apply -f k8s/backend-ingress.yaml
+
+      - name: Update deployment image
+        run: |
+          kubectl set image deployment/fund-rag-backend \
+            backend=${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            --namespace=${{ env.NAMESPACE }}
+
+      - name: Wait for rollout
+        run: kubectl rollout status deployment/fund-rag-backend --namespace=${{ env.NAMESPACE }} --timeout=300s

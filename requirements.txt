@@ -1,0 +1,7 @@
+# Fund RAG POC Dependencies
+python-dotenv>=1.0.0
+psycopg2-binary>=2.9.0
+openai>=1.0.0
+azure-search-documents>=11.4.0
+azure-identity>=1.15.0
+azure-core>=1.29.0

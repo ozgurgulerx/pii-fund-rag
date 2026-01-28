@@ -1,0 +1,275 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Ivory Ledger - Light Theme */
+    --background: 40 20% 98%;
+    --foreground: 220 20% 10%;
+
+    --card: 40 15% 96%;
+    --card-foreground: 220 20% 10%;
+
+    --popover: 40 15% 98%;
+    --popover-foreground: 220 20% 10%;
+
+    --primary: 220 15% 20%;
+    --primary-foreground: 40 20% 98%;
+
+    --secondary: 40 10% 92%;
+    --secondary-foreground: 220 15% 20%;
+
+    --muted: 40 10% 90%;
+    --muted-foreground: 220 10% 45%;
+
+    --accent: 43 74% 49%;
+    --accent-foreground: 220 20% 10%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 10% 88%;
+    --input: 220 10% 88%;
+    --ring: 43 74% 49%;
+
+    /* Custom tokens */
+    --gold: 43 74% 49%;
+    --gold-muted: 43 40% 65%;
+
+    --surface-1: 40 15% 96%;
+    --surface-2: 40 12% 94%;
+    --surface-3: 40 10% 91%;
+
+    --radius: 0.625rem;
+  }
+
+  .dark {
+    /* Obsidian Ledger - Dark Theme */
+    --background: 225 15% 8%;
+    --foreground: 40 10% 92%;
+
+    --card: 225 12% 11%;
+    --card-foreground: 40 10% 92%;
+
+    --popover: 225 12% 11%;
+    --popover-foreground: 40 10% 92%;
+
+    --primary: 43 60% 55%;
+    --primary-foreground: 225 15% 8%;
+
+    --secondary: 225 10% 15%;
+    --secondary-foreground: 40 10% 85%;
+
+    --muted: 225 10% 18%;
+    --muted-foreground: 40 5% 55%;
+
+    --accent: 43 60% 45%;
+    --accent-foreground: 225 15% 8%;
+
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 225 8% 20%;
+    --input: 225 8% 20%;
+    --ring: 43 60% 45%;
+
+    /* Custom tokens */
+    --gold: 43 60% 45%;
+    --gold-muted: 43 30% 35%;
+
+    --surface-1: 225 12% 11%;
+    --surface-2: 225 10% 14%;
+    --surface-3: 225 8% 17%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Custom scrollbar for dark theme */
+  .dark ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .dark ::-webkit-scrollbar-track {
+    background: hsl(var(--surface-1));
+  }
+
+  .dark ::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 4px;
+  }
+
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground));
+  }
+
+  /* Light theme scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--surface-1));
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground));
+  }
+}
+
+@layer utilities {
+  /* Hairline border utility */
+  .border-hairline {
+    border-width: 0.5px;
+  }
+
+  /* Noise overlay for premium texture */
+  .noise-overlay::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    opacity: 0.03;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Grid background pattern */
+  .grid-pattern {
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  /* Text gradient for gold accents */
+  .text-gold-gradient {
+    background: linear-gradient(135deg, hsl(43, 60%, 55%) 0%, hsl(43, 40%, 45%) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Subtle glow for interactive elements */
+  .glow-gold {
+    box-shadow: 0 0 20px -5px hsl(43, 60%, 45%, 0.3);
+  }
+
+  /* Surface elevation helpers */
+  .surface-1 {
+    background-color: hsl(var(--surface-1));
+  }
+
+  .surface-2 {
+    background-color: hsl(var(--surface-2));
+  }
+
+  .surface-3 {
+    background-color: hsl(var(--surface-3));
+  }
+}
+
+/* Markdown content styling */
+.markdown-content {
+  @apply leading-relaxed;
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3 {
+  @apply font-semibold tracking-tight mt-6 mb-3;
+}
+
+.markdown-content h1 {
+  @apply text-xl;
+}
+
+.markdown-content h2 {
+  @apply text-lg;
+}
+
+.markdown-content h3 {
+  @apply text-base;
+}
+
+.markdown-content p {
+  @apply mb-3 last:mb-0;
+}
+
+.markdown-content ul,
+.markdown-content ol {
+  @apply mb-3 pl-5;
+}
+
+.markdown-content li {
+  @apply mb-1;
+}
+
+.markdown-content ul {
+  @apply list-disc;
+}
+
+.markdown-content ol {
+  @apply list-decimal;
+}
+
+.markdown-content code {
+  @apply font-mono text-sm bg-muted px-1.5 py-0.5 rounded;
+}
+
+.markdown-content pre {
+  @apply bg-muted p-4 rounded-lg overflow-x-auto mb-3;
+}
+
+.markdown-content pre code {
+  @apply bg-transparent p-0;
+}
+
+.markdown-content blockquote {
+  @apply border-l-2 border-border pl-4 italic text-muted-foreground mb-3;
+}
+
+.markdown-content table {
+  @apply w-full border-collapse mb-3;
+}
+
+.markdown-content th,
+.markdown-content td {
+  @apply border border-border px-3 py-2 text-left text-sm;
+}
+
+.markdown-content th {
+  @apply bg-muted font-medium;
+}
+
+.markdown-content tr:nth-child(even) {
+  @apply bg-muted/50;
+}
+
+.markdown-content a {
+  @apply text-primary underline underline-offset-2 hover:text-primary/80 transition-colors;
+}
+
+/* Citation chip styling */
+.citation-chip {
+  @apply inline-flex items-center justify-center h-5 min-w-[1.25rem] px-1 text-xs font-medium
+         bg-gold/20 text-gold border border-gold/30 rounded cursor-pointer
+         hover:bg-gold/30 transition-colors;
+}
+
+.citation-chip.active {
+  @apply bg-gold text-background;
+}

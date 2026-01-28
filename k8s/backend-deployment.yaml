@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fund-rag-backend
+  namespace: fund-rag
+  labels:
+    app: fund-rag-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: fund-rag-backend
+  template:
+    metadata:
+      labels:
+        app: fund-rag-backend
+    spec:
+      containers:
+      - name: backend
+        image: aistartuptr.azurecr.io/fund-rag-backend:latest
+        ports:
+        - containerPort: 5001
+          name: http
+        envFrom:
+        - configMapRef:
+            name: backend-config
+        - secretRef:
+            name: backend-secrets
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5001
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5001
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+      imagePullSecrets:
+      - name: acr-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fund-rag-backend
+  namespace: fund-rag
+spec:
+  selector:
+    app: fund-rag-backend
+  ports:
+  - port: 5001
+    targetPort: 5001
+    name: http
+  type: ClusterIP

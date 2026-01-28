@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+  namespace: fund-rag
+data:
+  # Azure OpenAI Configuration
+  AZURE_OPENAI_ENDPOINT: "https://aoai-ep-swedencentral02.openai.azure.com/"
+  AZURE_OPENAI_DEPLOYMENT_NAME: "gpt-5-nano"
+  AZURE_TEXT_EMBEDDING_DEPLOYMENT_NAME: "text-embedding-3-small"
+
+  # Azure AI Search Configuration
+  AZURE_SEARCH_ENDPOINT: "https://chatops-ozguler.search.windows.net"
+
+  # PII Container Configuration
+  PII_ENDPOINT: "http://pii-ozguler.eastus.azurecontainer.io:5000"
+  PII_CONTAINER_ENDPOINT: "http://pii-ozguler.eastus.azurecontainer.io:5000"
+
+  # PostgreSQL Configuration (using private endpoint)
+  PGHOST: "aistartupstr.postgres.database.azure.com"
+  PGPORT: "5432"
+  PGDATABASE: "fundrag"
+  PGUSER: "ozgurguler"
+
+  # Application Configuration
+  FLASK_ENV: "production"
+  LOG_LEVEL: "INFO"
+  USE_POSTGRES: "true"
