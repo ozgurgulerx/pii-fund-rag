@@ -48,11 +48,18 @@ export function MessageComposer({
   const [detectedCategories, setDetectedCategories] = useState<string[]>([]);
   const [showPassedBanner, setShowPassedBanner] = useState(false);
   const [blockedMessage, setBlockedMessage] = useState<string | null>(null); // Store blocked message for restore
+  // Track hydration to prevent SSR/client mismatch with Framer Motion animations
+  const [isHydrated, setIsHydrated] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const passedTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const bannerTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const liveRegionRef = useRef<HTMLDivElement>(null); // For accessibility announcements
   const { toast } = useToast();
+
+  // Mark component as hydrated after mount to enable animations
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   // Auto-resize textarea
   useEffect(() => {
@@ -210,7 +217,7 @@ export function MessageComposer({
     <div className="border-t border-border bg-surface-1 p-4 relative overflow-hidden">
       {/* ========== SCANNING STATE - Full Width Overlay ========== */}
       <AnimatePresence>
-        {piiStatus === "checking" && (
+        {isHydrated && piiStatus === "checking" && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -242,7 +249,7 @@ export function MessageComposer({
 
       {/* ========== SUCCESS STATE - Green Flash & Banner ========== */}
       <AnimatePresence>
-        {piiStatus === "passed" && (
+        {isHydrated && piiStatus === "passed" && (
           <>
             {/* Full overlay green flash */}
             <motion.div
@@ -279,7 +286,7 @@ export function MessageComposer({
 
       {/* ========== SUCCESS BANNER ========== */}
       <AnimatePresence>
-        {showPassedBanner && (
+        {isHydrated && showPassedBanner && (
           <motion.div
             initial={{ opacity: 0, y: -30, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -329,7 +336,7 @@ export function MessageComposer({
 
       {/* ========== BLOCKED STATE - Red Flash & Error Banner ========== */}
       <AnimatePresence>
-        {piiStatus === "blocked" && (
+        {isHydrated && piiStatus === "blocked" && (
           <>
             {/* Full overlay red flash */}
             <motion.div
@@ -378,7 +385,7 @@ export function MessageComposer({
 
       {/* ========== ERROR BANNER ========== */}
       <AnimatePresence>
-        {piiError && (
+        {isHydrated && piiError && (
           <motion.div
             initial={{ opacity: 0, y: -20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -511,139 +518,169 @@ export function MessageComposer({
 
           {/* Security Status Badge - Inside textarea */}
           <div className="absolute right-3 bottom-3">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={piiStatus}
-                initial={{ opacity: 0, scale: 0.8, y: 5 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.8, y: -5 }}
-                transition={{ duration: 0.2 }}
-                className={cn(
-                  "flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold transition-all",
-                  piiStatus === "idle" && "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400",
-                  piiStatus === "checking" && "bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-400",
-                  piiStatus === "passed" && "bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400",
-                  piiStatus === "blocked" && "bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400"
-                )}
-              >
-                {piiStatus === "idle" && (
-                  <>
-                    <Shield className="h-3.5 w-3.5" />
-                    <span>PII Protected</span>
-                  </>
-                )}
-                {piiStatus === "checking" && (
-                  <>
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                    >
-                      <Scan className="h-3.5 w-3.5" />
-                    </motion.div>
-                    <span>Scanning...</span>
-                  </>
-                )}
-                {piiStatus === "passed" && (
-                  <>
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: [0, 1.3, 1] }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <ShieldCheck className="h-3.5 w-3.5" />
-                    </motion.div>
-                    <span>Secure</span>
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ delay: 0.1, type: "spring" }}
-                    >
-                      <CheckCircle2 className="h-3.5 w-3.5" />
-                    </motion.div>
-                  </>
-                )}
-                {piiStatus === "blocked" && (
-                  <>
-                    <motion.div
-                      animate={{ scale: [1, 1.2, 1] }}
-                      transition={{ duration: 0.5, repeat: Infinity }}
-                    >
-                      <ShieldX className="h-3.5 w-3.5" />
-                    </motion.div>
-                    <span>Blocked</span>
-                    <XCircle className="h-3.5 w-3.5" />
-                  </>
-                )}
-              </motion.div>
-            </AnimatePresence>
+            {/* Static badge before hydration to prevent mismatch */}
+            {!isHydrated && (
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                <Shield className="h-3.5 w-3.5" />
+                <span>PII Protected</span>
+              </div>
+            )}
+            {/* Animated badge after hydration */}
+            {isHydrated && (
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={piiStatus}
+                  initial={{ opacity: 0, scale: 0.8, y: 5 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.8, y: -5 }}
+                  transition={{ duration: 0.2 }}
+                  className={cn(
+                    "flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold transition-all",
+                    piiStatus === "idle" && "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400",
+                    piiStatus === "checking" && "bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-400",
+                    piiStatus === "passed" && "bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400",
+                    piiStatus === "blocked" && "bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400"
+                  )}
+                >
+                  {piiStatus === "idle" && (
+                    <>
+                      <Shield className="h-3.5 w-3.5" />
+                      <span>PII Protected</span>
+                    </>
+                  )}
+                  {piiStatus === "checking" && (
+                    <>
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      >
+                        <Scan className="h-3.5 w-3.5" />
+                      </motion.div>
+                      <span>Scanning...</span>
+                    </>
+                  )}
+                  {piiStatus === "passed" && (
+                    <>
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: [0, 1.3, 1] }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <ShieldCheck className="h-3.5 w-3.5" />
+                      </motion.div>
+                      <span>Secure</span>
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ delay: 0.1, type: "spring" }}
+                      >
+                        <CheckCircle2 className="h-3.5 w-3.5" />
+                      </motion.div>
+                    </>
+                  )}
+                  {piiStatus === "blocked" && (
+                    <>
+                      <motion.div
+                        animate={{ scale: [1, 1.2, 1] }}
+                        transition={{ duration: 0.5, repeat: Infinity }}
+                      >
+                        <ShieldX className="h-3.5 w-3.5" />
+                      </motion.div>
+                      <span>Blocked</span>
+                      <XCircle className="h-3.5 w-3.5" />
+                    </>
+                  )}
+                </motion.div>
+              </AnimatePresence>
+            )}
           </div>
         </div>
 
         {/* Submit Button */}
-        <motion.div
-          animate={piiStatus === "blocked" ? { x: [0, -5, 5, -5, 5, 0] } : {}}
-          transition={{ duration: 0.4 }}
-        >
-          <Button
-            onClick={handleSubmit}
-            disabled={isSubmitDisabled}
-            size="icon"
-            className={cn(
-              "h-[52px] w-[52px] shrink-0 transition-all duration-300 rounded-xl",
-              piiStatus === "idle" && "bg-primary hover:bg-primary/90",
-              piiStatus === "passed" && "bg-emerald-500 hover:bg-emerald-600 shadow-lg shadow-emerald-500/30",
-              piiStatus === "blocked" && "bg-red-500 hover:bg-red-600 shadow-lg shadow-red-500/30",
-              piiStatus === "checking" && "bg-amber-500 hover:bg-amber-600 shadow-lg shadow-amber-500/30"
-            )}
-          >
-            {isLoading ? (
-              <Loader2 className="h-5 w-5 animate-spin text-white" />
-            ) : piiStatus === "checking" ? (
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-              >
-                <Scan className="h-5 w-5 text-white" />
-              </motion.div>
-            ) : piiStatus === "blocked" ? (
-              <motion.div
-                animate={{ rotate: [0, -15, 15, -15, 15, 0] }}
-                transition={{ duration: 0.5 }}
-              >
-                <XCircle className="h-5 w-5 text-white" />
-              </motion.div>
-            ) : piiStatus === "passed" ? (
-              <motion.div
-                initial={{ scale: 0, rotate: -180 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ type: "spring", stiffness: 400, damping: 15 }}
-              >
-                <CheckCircle2 className="h-5 w-5 text-white" />
-              </motion.div>
-            ) : (
+        {!isHydrated ? (
+          <div>
+            <Button
+              onClick={handleSubmit}
+              disabled={isSubmitDisabled}
+              size="icon"
+              className="h-[52px] w-[52px] shrink-0 transition-all duration-300 rounded-xl bg-primary hover:bg-primary/90"
+            >
               <Send className="h-5 w-5 text-white" />
-            )}
-          </Button>
-        </motion.div>
+            </Button>
+          </div>
+        ) : (
+          <motion.div
+            animate={piiStatus === "blocked" ? { x: [0, -5, 5, -5, 5, 0] } : {}}
+            transition={{ duration: 0.4 }}
+          >
+            <Button
+              onClick={handleSubmit}
+              disabled={isSubmitDisabled}
+              size="icon"
+              className={cn(
+                "h-[52px] w-[52px] shrink-0 transition-all duration-300 rounded-xl",
+                piiStatus === "idle" && "bg-primary hover:bg-primary/90",
+                piiStatus === "passed" && "bg-emerald-500 hover:bg-emerald-600 shadow-lg shadow-emerald-500/30",
+                piiStatus === "blocked" && "bg-red-500 hover:bg-red-600 shadow-lg shadow-red-500/30",
+                piiStatus === "checking" && "bg-amber-500 hover:bg-amber-600 shadow-lg shadow-amber-500/30"
+              )}
+            >
+              {isLoading ? (
+                <Loader2 className="h-5 w-5 animate-spin text-white" />
+              ) : piiStatus === "checking" ? (
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                >
+                  <Scan className="h-5 w-5 text-white" />
+                </motion.div>
+              ) : piiStatus === "blocked" ? (
+                <motion.div
+                  animate={{ rotate: [0, -15, 15, -15, 15, 0] }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <XCircle className="h-5 w-5 text-white" />
+                </motion.div>
+              ) : piiStatus === "passed" ? (
+                <motion.div
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                >
+                  <CheckCircle2 className="h-5 w-5 text-white" />
+                </motion.div>
+              ) : (
+                <Send className="h-5 w-5 text-white" />
+              )}
+            </Button>
+          </motion.div>
+        )}
       </div>
 
       {/* Helper text */}
-      <motion.p
-        className={cn(
-          "text-xs mt-3 flex items-center gap-1.5 transition-colors duration-300",
-          piiStatus === "blocked" ? "text-red-500" : "text-muted-foreground"
-        )}
-        animate={piiStatus === "blocked" ? { x: [0, -2, 2, -2, 2, 0] } : {}}
-        transition={{ duration: 0.3 }}
-      >
-        <Shield className="h-3.5 w-3.5" />
-        <span>
-          {piiStatus === "blocked"
-            ? "Please remove personal information and try again"
-            : "Press Enter to send. Personal information (SSN, credit cards, etc.) is automatically blocked."
-          }
-        </span>
-      </motion.p>
+      {!isHydrated ? (
+        <p className="text-xs mt-3 flex items-center gap-1.5 text-muted-foreground">
+          <Shield className="h-3.5 w-3.5" />
+          <span>Press Enter to send. Personal information (SSN, credit cards, etc.) is automatically blocked.</span>
+        </p>
+      ) : (
+        <motion.p
+          className={cn(
+            "text-xs mt-3 flex items-center gap-1.5 transition-colors duration-300",
+            piiStatus === "blocked" ? "text-red-500" : "text-muted-foreground"
+          )}
+          animate={piiStatus === "blocked" ? { x: [0, -2, 2, -2, 2, 0] } : {}}
+          transition={{ duration: 0.3 }}
+        >
+          <Shield className="h-3.5 w-3.5" />
+          <span>
+            {piiStatus === "blocked"
+              ? "Please remove personal information and try again"
+              : "Press Enter to send. Personal information (SSN, credit cards, etc.) is automatically blocked."
+            }
+          </span>
+        </motion.p>
+      )}
 
       {/* Accessibility Live Region - announces PII status to screen readers */}
       <div

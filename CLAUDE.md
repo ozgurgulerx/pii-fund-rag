@@ -566,3 +566,67 @@ curl -s "https://fundrag-frontend.azurewebsites.net/api/chat" \
 - Removing `fund-rag-backend-internal` service
 - Changing ports or selectors
 - Modifying namespace from `fund-rag`
+
+---
+
+## GitHub Actions CI/CD Configuration (WORKING - DO NOT CHANGE)
+
+### Azure OIDC Authentication Setup
+
+The deployment uses **federated credentials** (OIDC) - no expiring secrets.
+
+**App Registration:**
+- App ID: `6b0857f6-4bcd-4014-8222-01e605a4d6c9`
+- Display Name: `github-fundrag-deploy`
+- Tenant: `16b3c013-d300-468d-ac64-7eda0820b6d3`
+
+**Federated Credential:**
+- Issuer: `https://token.actions.githubusercontent.com`
+- Subject: `repo:ozgurgulerx/pii-fund-rag:ref:refs/heads/main`
+- Audience: `api://AzureADTokenExchange`
+
+**Service Principal:**
+- Has **Contributor** role on `rg-fund-rag` resource group
+
+### GitHub Secrets (Already Configured)
+
+| Secret | Value |
+|--------|-------|
+| `AZURE_CLIENT_ID` | `6b0857f6-4bcd-4014-8222-01e605a4d6c9` |
+| `AZURE_TENANT_ID` | `16b3c013-d300-468d-ac64-7eda0820b6d3` |
+| `AZURE_SUBSCRIPTION_ID` | `a20bc194-9787-44ee-9c7f-7c3130e651b6` |
+
+### If GitHub Actions Fails
+
+1. **"Service principal missing"** error:
+   ```bash
+   az ad sp create --id 6b0857f6-4bcd-4014-8222-01e605a4d6c9
+   az role assignment create --assignee 6b0857f6-4bcd-4014-8222-01e605a4d6c9 \
+     --role Contributor \
+     --scope /subscriptions/a20bc194-9787-44ee-9c7f-7c3130e651b6/resourceGroups/rg-fund-rag
+   ```
+
+2. **"Federated credential not found"** error:
+   ```bash
+   az ad app federated-credential create --id 498a7cd9-8785-4e09-a42c-4a1b7cdbdca1 --parameters '{
+     "name": "github-main-branch",
+     "issuer": "https://token.actions.githubusercontent.com",
+     "subject": "repo:ozgurgulerx/pii-fund-rag:ref:refs/heads/main",
+     "audiences": ["api://AzureADTokenExchange"]
+   }'
+   ```
+
+### Workflow Triggers
+
+The frontend deploys automatically when these paths change:
+- `src/app/**`
+- `src/components/**`
+- `src/lib/**`
+- `src/hooks/**`
+- `src/types/**`
+- `src/data/**`
+- `src/package.json`
+- `src/next.config.mjs`
+- `src/tailwind.config.ts`
+
+Or manually via `workflow_dispatch`.
