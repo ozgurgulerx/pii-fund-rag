@@ -48,3 +48,7 @@ k8s/backend-secret.yaml
 # Test coverage
 coverage/
 .nyc_output/
+
+# Local development docs
+CLAUDE.md
+.claude/
