@@ -1,233 +1,259 @@
-# Fund Intelligence RAG System
+<p align="center">
+  <img src="https://img.shields.io/badge/Azure-Deployed-0078D4?style=for-the-badge&logo=microsoft-azure" alt="Azure Deployed">
+  <img src="https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js" alt="Next.js 15">
+  <img src="https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
+  <img src="https://img.shields.io/badge/PII-Protected-success?style=for-the-badge&logo=shield" alt="PII Protected">
+</p>
 
-An enterprise-grade Retrieval-Augmented Generation (RAG) chatbot for querying mutual fund data using natural language. Combines SEC N-PORT filings with IMF World Economic Outlook for comprehensive fund analysis with multi-layer PII protection.
+<h1 align="center">Fund Intelligence</h1>
 
-## Features
+<p align="center">
+  <strong>AI-powered mutual fund analysis with enterprise-grade security</strong>
+</p>
 
-- **Natural Language Queries** - Ask questions about mutual funds in plain English
-- **5 Intelligent Query Routes** - Automatic routing to optimal retrieval strategy
-- **Multi-Source RAG** - Combines SQL, semantic search, and economic context
-- **PII Protection** - Multi-layer security with visual feedback
-- **Dual Retrieval Modes** - Code-based RAG or Azure AI Foundry managed agent
-- **Real-time Streaming** - Server-sent events for fast response display
-- **Full Citations** - Source provenance with confidence scores
+<p align="center">
+  Ask questions about 490,000+ fund holdings in plain English.<br>
+  Get verified answers with full source citations.<br>
+  Protected by multi-layer PII detection.
+</p>
 
-## Data Sources
+<p align="center">
+  <a href="#-quick-start">Quick Start</a> •
+  <a href="#-features">Features</a> •
+  <a href="#-architecture">Architecture</a> •
+  <a href="#-query-types">Query Types</a> •
+  <a href="#-deployment">Deployment</a>
+</p>
 
-### SEC N-PORT Filings (Q4 2024)
+---
 
-| Metric | Value |
-|--------|-------|
-| Funds | 250 |
-| Holdings | 490,447 |
-| Security Identifiers | 572,768 |
-| Debt Securities | 305,413 |
+## The Problem
 
-**Available Data:**
-- Fund assets, liabilities, monthly flows
-- Individual holdings with CUSIP, position size, asset category
-- Interest rate risk (DV01 by tenor)
-- Credit spreads (investment grade vs non-investment grade)
-- Derivatives, securities lending, counterparty information
+Financial analysts spend **hours** querying multiple systems to analyze mutual fund data, cross-reference holdings, and incorporate macroeconomic context into investment decisions.
 
-### IMF World Economic Outlook (RAPTOR Index)
+## Our Solution
 
-Hierarchical index of IMF economic projections:
-- Inflation forecasts
-- GDP growth projections
-- Interest rate expectations
-- Emerging market analysis
-
-## Query Types
-
-| Route | Description | Example |
-|-------|-------------|---------|
-| **SQL** | Precise data lookups | "Top 10 funds by AUM" |
-| **Semantic** | Style/similarity search | "Conservative income funds" |
-| **RAPTOR** | Economic outlook queries | "IMF inflation outlook 2025" |
-| **Hybrid** | Fund + macro combined | "Best bonds for rate cuts" |
-| **Chain** | Macro-driven selection | "Position portfolio for IMF forecast" |
-
-## Architecture
-
-### Cloud Deployment (Azure)
+A natural language interface that combines **SEC N-PORT filings** with **IMF World Economic Outlook** to deliver instant, cited answers with enterprise security.
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                              AZURE DEPLOYMENT                                │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                              │
-│  ┌──────────────────────┐        ┌──────────────────────────────────────┐   │
-│  │   Azure App Service  │        │     Azure Kubernetes Service (AKS)   │   │
-│  │   (Frontend)         │        │     (Backend)                        │   │
-│  │                      │        │                                      │   │
-│  │  Next.js 15 + React  │───────▶│  Flask API + RAG Logic               │   │
-│  │  PII UI animations   │  API   │  /api/chat, /health                  │   │
-│  └──────────┬───────────┘        └──────────────┬───────────────────────┘   │
-│             │                                    │                          │
-│             │ PII Check                          │ Data Access              │
-│             ▼                                    ▼                          │
-│  ┌──────────────────────┐        ┌──────────────────────────────────────┐   │
-│  │  Azure Container     │        │    Azure PostgreSQL (Private EP)     │   │
-│  │  Instances (PII)     │        │    250 funds, 490K holdings          │   │
-│  │  Language AI Service │        │    nport_funds schema                │   │
-│  └──────────────────────┘        └──────────────────────────────────────┘   │
-│                                                                              │
-│  ┌──────────────────────┐        ┌──────────────────────────────────────┐   │
-│  │  Azure AI Search     │        │    Azure OpenAI                      │   │
-│  │  • nport-funds-index │        │    • gpt-5-nano (routing/synthesis)  │   │
-│  │  • imf_raptor        │        │    • text-embedding-3-small          │   │
-│  └──────────────────────┘        └──────────────────────────────────────┘   │
-│                                                                              │
-└─────────────────────────────────────────────────────────────────────────────┘
+You: "Best bond funds given IMF's rate outlook"
+
+Fund Intelligence: Based on IMF's projection for rate cuts in H2 2025,
+I recommend duration-sensitive funds:
+
+1. Vanguard Long-Term Treasury ($89.2B) - Maximum rate sensitivity [1]
+2. PIMCO Income Fund ($142.7B) - Quality yield with MBS exposure [2]
+3. MetWest Total Return ($78.4B) - Diversified duration play [3]
+
+Sources: [1] SEC N-PORT Q4 2024, [2] SEC N-PORT Q4 2024, [3] IMF WEO Oct 2024
 ```
 
-### Network Architecture
+---
+
+## ✨ Features
+
+<table>
+<tr>
+<td width="50%">
+
+### 🧠 Intelligent Query Routing
+Automatically selects the optimal retrieval strategy—SQL, semantic search, or economic context—based on your question.
+
+### 🔒 Enterprise PII Protection
+Multi-layer security blocks sensitive data (SSN, credit cards, bank accounts) with real-time visual feedback.
+
+### 📊 Comprehensive Data
+490K+ holdings from SEC N-PORT filings combined with IMF economic projections.
+
+</td>
+<td width="50%">
+
+### ⚡ Real-time Streaming
+Server-sent events deliver responses word-by-word for a natural chat experience.
+
+### 📝 Full Citations
+Every answer includes source provenance with confidence scores—no black boxes.
+
+### 🔄 Dual Retrieval Modes
+Choose between full-control Code-based RAG or Azure-managed Foundry IQ.
+
+</td>
+</tr>
+</table>
+
+---
+
+## 📊 Data at a Glance
+
+<table>
+<tr>
+<td align="center"><h3>250</h3>Mutual Funds</td>
+<td align="center"><h3>490K+</h3>Holdings</td>
+<td align="center"><h3>572K</h3>Security IDs</td>
+<td align="center"><h3>305K</h3>Debt Securities</td>
+</tr>
+</table>
+
+**Sources:**
+- **SEC N-PORT** — Quarterly regulatory filings with fund assets, holdings, risk metrics, derivatives
+- **IMF WEO** — World Economic Outlook with inflation forecasts, growth projections, rate expectations
+
+---
+
+## 🎯 Query Types
+
+| Type | Use Case | Example |
+|:-----|:---------|:--------|
+| **SQL** | Precise data lookups | *"Top 10 funds by AUM"* |
+| **Semantic** | Style & similarity | *"Conservative income funds"* |
+| **RAPTOR** | Economic outlook | *"IMF inflation forecast 2025"* |
+| **Hybrid** | Fund + macro combined | *"Best bonds for rate cuts"* |
+| **Chain** | Multi-step reasoning | *"Position portfolio for IMF outlook"* |
+
+<details>
+<summary><strong>See more example queries →</strong></summary>
+
+### SQL Queries
+- "Which funds hold NVIDIA stock?"
+- "Show funds with DV01 exposure > $5M"
+- "List all Vanguard funds over $50B AUM"
+
+### Semantic Queries
+- "Funds similar to PIMCO Income Fund"
+- "Growth-oriented equity funds"
+- "Low-risk bond funds for retirement"
+
+### Hybrid Queries
+- "Top funds considering inflation outlook"
+- "Duration-sensitive funds for rate cut scenario"
+
+### Chain Queries
+- "Best funds if inflation rises above 3%"
+- "Which funds benefit from EM recovery?"
+
+### RAPTOR Queries
+- "Global recession risk according to IMF"
+- "Summarize IMF views on emerging markets"
+
+</details>
+
+---
+
+## 🏗 Architecture
+
+### Cloud Infrastructure
 
 ```
-VNet: vnet-fund-rag (10.0.0.0/16)
-├── subnet-aks (10.0.0.0/22) - AKS nodes
-├── subnet-appservice (10.0.4.0/24) - App Service VNet integration
-└── subnet-privateendpoint (10.0.5.0/24) - PostgreSQL private endpoint
-
-Private DNS Zone: privatelink.postgres.database.azure.com
+┌─────────────────────────────────────────────────────────────────────────┐
+│                              AZURE                                       │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│   ┌─────────────┐      ┌─────────────┐      ┌─────────────────────┐    │
+│   │ App Service │      │     AKS     │      │    PostgreSQL       │    │
+│   │  (Next.js)  │─────▶│   (Flask)   │─────▶│   (Private EP)      │    │
+│   │             │      │             │      │                     │    │
+│   │  Frontend   │      │  RAG Logic  │      │  250 funds          │    │
+│   │  PII UI     │      │  5 Routes   │      │  490K holdings      │    │
+│   └──────┬──────┘      └──────┬──────┘      └─────────────────────┘    │
+│          │                    │                                         │
+│          ▼                    ▼                                         │
+│   ┌─────────────┐      ┌─────────────┐      ┌─────────────────────┐    │
+│   │     PII     │      │  AI Search  │      │    Azure OpenAI     │    │
+│   │  Container  │      │             │      │                     │    │
+│   │             │      │  • funds    │      │  • gpt-5-nano       │    │
+│   │  Language   │      │  • imf      │      │  • embeddings       │    │
+│   │  Service    │      │    raptor   │      │                     │    │
+│   └─────────────┘      └─────────────┘      └─────────────────────┘    │
+│                                                                          │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
 
 ### Request Flow
 
 ```
-User Query → PII Check → Route Classification → Retrieval → Synthesis → Response
-
-1. User enters message in chat UI
-2. Frontend checks PII via Azure Language Service container
-   ├── If PII detected → RED animation, message blocked
-   └── If clean → GREEN animation, proceed
-3. Backend classifies query into one of 5 routes
-4. Execute retrieval:
-   ├── SQL → PostgreSQL
-   ├── SEMANTIC → Azure AI Search (nport-funds-index)
-   ├── RAPTOR → Azure AI Search (imf_raptor)
-   └── HYBRID → All three in parallel
-5. LLM synthesizes answer with citations
-6. Stream response back to frontend (SSE)
+User Query → PII Check → Route → Retrieve → Synthesize → Stream Response
+     │           │          │         │           │            │
+     │      Block if      Auto-    Parallel    Combine      5ms/word
+     │      detected     classify   fetch      sources      streaming
 ```
 
-## Two Retrieval Modes
+### Network Security
 
-### Code-Based RAG (Default)
+- **VNet Isolation** — All services in private subnet
+- **Private Endpoints** — Database accessible only via internal IP
+- **PII Container** — On-premises simulation for compliance
 
-Full control with 5 query routes including macro context:
+---
 
-```python
-retriever = UnifiedRetriever()
-result = retriever.answer("Best bond funds given IMF outlook")
-# Routes: SQL, SEMANTIC, RAPTOR, HYBRID, CHAIN
-```
+## 🔄 Two Retrieval Paths
 
-### Foundry IQ (Azure Managed)
+<table>
+<tr>
+<th width="50%">Code-Based RAG</th>
+<th width="50%">Foundry IQ</th>
+</tr>
+<tr>
+<td>
 
-Azure AI Foundry managed agent with 3 routes:
+**5 Routes** — Full routing control
 
-```python
-client = FoundryAgentClient()
-result = client.chat("Top 10 bond funds")
-# Routes: SQL, SEMANTIC, HYBRID
-```
+✅ SQL, Semantic, RAPTOR, Hybrid, Chain
+✅ IMF macro context
+✅ Multi-step reasoning
+✅ Detailed citations
 
-| Aspect | Code-Based RAG | Foundry IQ |
-|--------|----------------|------------|
-| Routes | 5 | 3 |
-| IMF Macro Context | Yes | No |
-| Multi-step Reasoning | Yes (Chain) | No |
-| Best For | Complex queries | Production simplicity |
+Best for: **Development, complex queries**
 
-## Project Structure
+</td>
+<td>
 
-```
-fund-rag-poc/
-├── src/                          # Frontend (Next.js) + Backend (Python)
-│   ├── app/                      # Next.js App Router
-│   │   ├── api/
-│   │   │   ├── chat/route.ts     # Chat API (proxies to Flask)
-│   │   │   └── pii/route.ts      # PII detection endpoint
-│   │   └── chat/page.tsx         # Main chat UI
-│   ├── components/
-│   │   ├── chat/
-│   │   │   ├── chat-thread.tsx   # Message display + query suggestions
-│   │   │   ├── message-composer.tsx  # PII-protected input
-│   │   │   └── follow-up-chips.tsx   # Suggestion chips
-│   │   └── layout/
-│   │       ├── sidebar.tsx       # Conversation list
-│   │       └── sources-panel.tsx # Citations viewer
-│   ├── data/seed.ts              # Query categories + sample data
-│   ├── lib/pii.ts                # PII detection logic
-│   │
-│   ├── api_server.py             # Flask backend
-│   ├── unified_retriever.py      # Multi-source RAG orchestrator
-│   ├── query_router.py           # Route classification
-│   ├── sql_generator.py          # LLM-based SQL generation
-│   ├── fund_rag_agent.py         # Standalone RAG agent
-│   ├── foundry_agent_client.py   # Foundry IQ wrapper
-│   └── pii_filter.py             # Python PII filter
-│
-├── k8s/                          # Kubernetes manifests for AKS
-├── .github/workflows/            # CI/CD pipelines
-├── Dockerfile.backend            # Backend container
-├── Dockerfile.frontend           # Frontend container
-└── nport_funds.db                # SQLite database (local dev)
-```
+**3 Routes** — Azure-managed
 
-## Local Development
+✅ SQL, Semantic, Hybrid
+✅ Azure AD authentication
+✅ Built-in tracing
+✅ Managed updates
+
+Best for: **Production, simplicity**
+
+</td>
+</tr>
+</table>
+
+---
+
+## 🚀 Quick Start
 
 ### Prerequisites
 
 - Node.js 18+
 - Python 3.10+
-- Azure subscription with:
-  - Azure OpenAI (gpt-5-nano, text-embedding-3-small)
-  - Azure AI Search
-  - Azure Language Service (PII container)
+- Azure subscription (OpenAI, AI Search, Language Service)
 
-### Setup
+### 1. Clone & Install
 
-1. **Clone and install dependencies:**
 ```bash
-cd fund-rag-poc/src
+git clone https://github.com/ozgurgulerx/pii-fund-rag.git
+cd pii-fund-rag/fund-rag-poc/src
+
+# Frontend
 npm install
+
+# Backend
 pip install -r requirements.txt
 ```
 
-2. **Configure environment:**
+### 2. Configure Environment
+
 ```bash
 cp .env.local.example .env.local
-# Edit .env.local with your Azure credentials
 ```
 
-3. **Start backend:**
-```bash
-python api_server.py
-# Runs on http://localhost:5001
-```
-
-4. **Start frontend:**
-```bash
-npm run dev
-# Runs on http://localhost:3001
-```
-
-5. **Open the app:**
-```
-http://localhost:3001/chat
-```
-
-### Environment Variables
-
-```bash
+```env
 # Azure OpenAI
-AZURE_OPENAI_ENDPOINT=https://your-openai.openai.azure.com
+AZURE_OPENAI_ENDPOINT=https://your-instance.openai.azure.com
 AZURE_OPENAI_API_KEY=your-key
 AZURE_OPENAI_DEPLOYMENT_NAME=gpt-5-nano
-AZURE_TEXT_EMBEDDING_DEPLOYMENT_NAME=text-embedding-3-small
 
 # Azure AI Search
 AZURE_SEARCH_ENDPOINT=https://your-search.search.windows.net
@@ -235,107 +261,99 @@ AZURE_SEARCH_ADMIN_KEY=your-key
 
 # PII Container
 PII_ENDPOINT=http://your-pii-container:5000
-
-# PostgreSQL (production)
-PGHOST=your-postgres.postgres.database.azure.com
-PGPORT=5432
-PGDATABASE=fundrag
-PGUSER=your-user
-PGPASSWORD=your-password
-USE_POSTGRES=true
 ```
 
-## Azure Deployment
-
-### Resources (rg-fund-rag)
-
-| Resource | Name | Purpose |
-|----------|------|---------|
-| App Service | fundrag-frontend | Next.js frontend |
-| AKS Cluster | aks-fund-rag | Backend (1-2 nodes autoscale) |
-| PostgreSQL | aistartupstr | Fund data (private endpoint) |
-| AI Search | chatops-ozguler | Semantic indexes |
-| Container Instance | pii-ozguler | PII detection |
-
-### CI/CD Pipelines
-
-| Workflow | Trigger | Action |
-|----------|---------|--------|
-| deploy-backend.yaml | Push to main | Build → ACR → AKS |
-| deploy-frontend.yaml | Push to main | Build → App Service |
-| migrate-database.yaml | Manual | PostgreSQL migrations |
-
-### Deploy Commands
+### 3. Run
 
 ```bash
-# Backend to AKS
-kubectl apply -f k8s/
+# Terminal 1: Backend
+python api_server.py  # → localhost:5001
 
-# Frontend to App Service
-az webapp deployment source config-zip \
-  --resource-group rg-fund-rag \
-  --name fundrag-frontend \
-  --src dist.zip
+# Terminal 2: Frontend
+npm run dev  # → localhost:3001
 ```
 
-## PII Protection
+### 4. Open
 
-### Protected Categories
+```
+http://localhost:3001/chat
+```
 
-- US Social Security Number
-- Credit Card Number
-- US Bank Account Number
-- IBAN, SWIFT Code
-- Driver's License, Passport
-- Email, Phone, Address
+---
 
-### User Experience States
+## 🔒 PII Protection
 
-| State | Visual Feedback |
-|-------|-----------------|
-| Idle | Gray "PII Protected" badge |
-| Scanning | Amber animation, pulsing border |
-| Passed | Green flash, "Security Check Passed" |
-| Blocked | Red flash + shake, shows detected categories |
+Real-time detection with visual feedback:
 
-## Sample Queries
+| State | Experience |
+|:------|:-----------|
+| **Idle** | Gray shield badge |
+| **Scanning** | Amber pulse animation |
+| **Passed** ✓ | Green flash → proceed |
+| **Blocked** ✗ | Red shake → shows detected categories |
 
-### SQL Queries
-- "Top 10 funds by total net assets"
-- "Which funds hold NVIDIA stock?"
-- "Show funds with DV01 exposure > $5M"
+**Protected categories:** SSN, Credit Card, Bank Account, IBAN, SWIFT, Driver's License, Passport, Tax ID, Email, Phone, Address
 
-### Semantic Queries
-- "Conservative income-focused funds"
-- "Funds similar to PIMCO Income Fund"
-- "Growth-oriented equity funds"
+---
 
-### Hybrid Queries
-- "Best bond funds given current rate environment"
-- "Top funds considering inflation outlook"
+## 📁 Project Structure
 
-### Chain Queries
-- "How should I position my portfolio for IMF's growth forecast?"
-- "Best funds if inflation rises above 3%"
+```
+fund-rag-poc/
+├── src/
+│   ├── app/                    # Next.js App Router
+│   │   ├── api/chat/           # Chat endpoint
+│   │   └── chat/               # Chat UI
+│   ├── components/             # React components
+│   ├── api_server.py           # Flask backend
+│   ├── unified_retriever.py    # RAG orchestrator
+│   ├── query_router.py         # Route classification
+│   └── foundry_agent_client.py # Foundry IQ
+├── k8s/                        # Kubernetes manifests
+├── .github/workflows/          # CI/CD
+└── README.md
+```
 
-### RAPTOR Queries
-- "What's the IMF's inflation outlook for 2025?"
-- "Global recession risk according to IMF"
+---
 
-## Performance
+## ☁️ Deployment
+
+### Azure Resources
+
+| Resource | Service | Purpose |
+|:---------|:--------|:--------|
+| `fundrag-frontend` | App Service | Next.js UI |
+| `aks-fund-rag` | AKS | Flask backend |
+| `aistartupstr` | PostgreSQL | Fund data |
+| `chatops-ozguler` | AI Search | Semantic indexes |
+| `pii-ozguler` | Container Instance | PII detection |
+
+### CI/CD
+
+| Workflow | Trigger | Action |
+|:---------|:--------|:-------|
+| `deploy-backend.yaml` | Push to main | Build → ACR → AKS |
+| `deploy-frontend.yaml` | Push to main | Build → App Service |
+
+---
+
+## ⚡ Performance
 
 | Metric | Value |
-|--------|-------|
-| Heuristic routing | ~0ms |
-| SQL query latency | <500ms |
+|:-------|:------|
+| Query routing | ~0ms (heuristic) |
+| SQL execution | <500ms |
 | Vector search | <200ms |
-| Streaming delay | 5ms/word |
-| PII check timeout | 5s |
+| Response streaming | 5ms/word |
 
-## License
+---
 
-Proprietary - Internal use only.
+## 📄 License
 
-## Support
+Proprietary — Internal use only.
 
-For issues or questions, contact the development team or open an issue in this repository.
+---
+
+<p align="center">
+  <strong>Built with ❤️ for financial intelligence</strong>
+</p>
