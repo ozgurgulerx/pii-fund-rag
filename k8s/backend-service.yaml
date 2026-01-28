@@ -13,3 +13,21 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 5001
+---
+# Internal LoadBalancer for App Service VNet integration
+apiVersion: v1
+kind: Service
+metadata:
+  name: fund-rag-backend-internal
+  namespace: fund-rag
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+    service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: /health
+spec:
+  type: LoadBalancer
+  selector:
+    app: fund-rag-backend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5001

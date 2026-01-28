@@ -50,5 +50,4 @@ coverage/
 .nyc_output/
 
 # Local development docs
-CLAUDE.md
 .claude/

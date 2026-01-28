@@ -140,6 +140,10 @@ export default function ChatPage() {
                   throw new Error(data.message);
               }
             } catch (e) {
+              // Re-throw if it's an intentional error (not a JSON parse error)
+              if (e instanceof Error && !e.message.includes("JSON")) {
+                throw e;
+              }
               // Ignore JSON parse errors for incomplete chunks
             }
           }
