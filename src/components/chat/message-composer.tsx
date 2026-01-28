@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { PiiGuidanceDialog } from "./pii-guidance-dialog";
 
 type PiiStatus = "idle" | "checking" | "passed" | "blocked";
 
@@ -657,30 +658,33 @@ export function MessageComposer({
         )}
       </div>
 
-      {/* Helper text */}
-      {!isHydrated ? (
-        <p className="text-xs mt-3 flex items-center gap-1.5 text-muted-foreground">
-          <Shield className="h-3.5 w-3.5" />
-          <span>Press Enter to send. Personal information (SSN, credit cards, etc.) is automatically blocked.</span>
-        </p>
-      ) : (
-        <motion.p
-          className={cn(
-            "text-xs mt-3 flex items-center gap-1.5 transition-colors duration-300",
-            piiStatus === "blocked" ? "text-red-500" : "text-muted-foreground"
-          )}
-          animate={piiStatus === "blocked" ? { x: [0, -2, 2, -2, 2, 0] } : {}}
-          transition={{ duration: 0.3 }}
-        >
-          <Shield className="h-3.5 w-3.5" />
-          <span>
-            {piiStatus === "blocked"
-              ? "Please remove personal information and try again"
-              : "Press Enter to send. Personal information (SSN, credit cards, etc.) is automatically blocked."
-            }
-          </span>
-        </motion.p>
-      )}
+      {/* Helper text with PII guidance link */}
+      <div className="flex items-center justify-between mt-3">
+        {!isHydrated ? (
+          <p className="text-xs flex items-center gap-1.5 text-muted-foreground">
+            <Shield className="h-3.5 w-3.5" />
+            <span>Press Enter to send. Personal information (SSN, credit cards, etc.) is automatically blocked.</span>
+          </p>
+        ) : (
+          <motion.p
+            className={cn(
+              "text-xs flex items-center gap-1.5 transition-colors duration-300",
+              piiStatus === "blocked" ? "text-red-500" : "text-muted-foreground"
+            )}
+            animate={piiStatus === "blocked" ? { x: [0, -2, 2, -2, 2, 0] } : {}}
+            transition={{ duration: 0.3 }}
+          >
+            <Shield className="h-3.5 w-3.5" />
+            <span>
+              {piiStatus === "blocked"
+                ? "Please remove personal information and try again"
+                : "Press Enter to send. Personal information (SSN, credit cards, etc.) is automatically blocked."
+              }
+            </span>
+          </motion.p>
+        )}
+        <PiiGuidanceDialog />
+      </div>
 
       {/* Accessibility Live Region - announces PII status to screen readers */}
       <div
