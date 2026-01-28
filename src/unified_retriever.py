@@ -9,6 +9,7 @@ import sqlite3
 from pathlib import Path
 from typing import List, Dict, Optional, Tuple
 from dataclasses import dataclass, field
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dotenv import load_dotenv
 from openai import AzureOpenAI
 from azure.core.credentials import AzureKeyCredential
@@ -236,14 +237,20 @@ class UnifiedRetriever:
         except Exception as e:
             return [{"error": str(e), "sql": sql}], sql, []
 
-    def query_semantic(self, query: str, top: int = 5) -> Tuple[List[Dict], List[Citation]]:
+    def query_semantic(self, query: str, top: int = 5, embedding: List[float] = None) -> Tuple[List[Dict], List[Citation]]:
         """
         Search fund index using semantic similarity.
+
+        Args:
+            query: Search query text
+            top: Number of results to return
+            embedding: Pre-computed embedding (optional, computed if not provided)
 
         Returns:
             Tuple of (results, citations)
         """
-        embedding = self.get_embedding(query)
+        if embedding is None:
+            embedding = self.get_embedding(query)
 
         vector_query = VectorizedQuery(
             vector=embedding,
@@ -284,10 +291,16 @@ class UnifiedRetriever:
 
         return results_list, citations
 
-    def query_raptor(self, query: str, topics: List[str] = None, top: int = 3) -> Tuple[List[Dict], List[Citation]]:
+    def query_raptor(self, query: str, topics: List[str] = None, top: int = 3, embedding: List[float] = None) -> Tuple[List[Dict], List[Citation]]:
         """
         Search RAPTOR index for macro/economic context.
         RAPTOR index fields: id, doc_id, level, kind, raw, contentVector
+
+        Args:
+            query: Search query text
+            topics: Optional topic hints for enhanced search
+            top: Number of results to return
+            embedding: Pre-computed embedding (optional, computed if not provided)
 
         Returns:
             Tuple of (results, citations)
@@ -301,7 +314,9 @@ class UnifiedRetriever:
             search_query = f"{query} {' '.join(topics)}"
 
         try:
-            embedding = self.get_embedding(search_query)
+            # Use provided embedding or compute new one
+            if embedding is None:
+                embedding = self.get_embedding(search_query)
 
             vector_query = VectorizedQuery(
                 vector=embedding,
@@ -409,15 +424,40 @@ class UnifiedRetriever:
     def execute_hybrid_route(self, query: str, sql_hint: str = None,
                             raptor_topics: List[str] = None) -> RetrievalResult:
         """Execute hybrid retrieval (SQL + Semantic + RAPTOR in parallel)."""
-        # Get all sources
-        sql_results, sql_query, sql_citations = self.query_sql(query, sql_hint)
-        semantic_results, semantic_citations = self.query_semantic(query, top=3)
-        raptor_results, raptor_citations = self.query_raptor(query, raptor_topics, top=2)
+        # Pre-compute embedding once for reuse in semantic and raptor searches
+        query_embedding = self.get_embedding(query)
+
+        # Execute all three retrieval methods in parallel using ThreadPoolExecutor
+        sql_results, sql_query, sql_citations = [], None, []
+        semantic_results, semantic_citations = [], []
+        raptor_results, raptor_citations = [], []
+
+        with ThreadPoolExecutor(max_workers=3) as executor:
+            # Submit all tasks
+            sql_future = executor.submit(self.query_sql, query, sql_hint)
+            semantic_future = executor.submit(self.query_semantic, query, 3, query_embedding)
+            raptor_future = executor.submit(self.query_raptor, query, raptor_topics, 2, query_embedding)
+
+            # Collect results as they complete
+            try:
+                sql_results, sql_query, sql_citations = sql_future.result(timeout=30)
+            except Exception as e:
+                print(f"SQL query error in parallel execution: {e}")
+
+            try:
+                semantic_results, semantic_citations = semantic_future.result(timeout=30)
+            except Exception as e:
+                print(f"Semantic query error in parallel execution: {e}")
+
+            try:
+                raptor_results, raptor_citations = raptor_future.result(timeout=30)
+            except Exception as e:
+                print(f"RAPTOR query error in parallel execution: {e}")
 
         # Combine context
         context = {
-            "sql_results": sql_results[:10],
-            "semantic_context": [r["content"][:200] for r in semantic_results],
+            "sql_results": sql_results[:10] if sql_results else [],
+            "semantic_context": [r["content"][:200] for r in semantic_results] if semantic_results else [],
             "macro_context": [
                 r.get("raw", r.get("content", ""))[:300]
                 for r in raptor_results
