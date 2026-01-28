@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
 import { Building2, Moon, Sun, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,10 +10,18 @@ import {
   TooltipTrigger,
   TooltipProvider,
 } from "@/components/ui/tooltip";
-import { getDataAsOfTimestamp, DATA_PROVIDERS } from "@/data/seed";
+import { DATA_PROVIDERS } from "@/data/seed";
 
 export function Header() {
   const { theme, setTheme } = useTheme();
+  // Prevent hydration mismatch by only showing dynamic content after mount
+  const [mounted, setMounted] = useState(false);
+  const [timestamp, setTimestamp] = useState<string | null>(null);
+
+  useEffect(() => {
+    setMounted(true);
+    setTimestamp(new Date().toISOString().split("T")[0] + " 08:00 UTC");
+  }, []);
 
   return (
     <header className="h-12 border-b border-border bg-surface-1 flex items-center justify-between px-4">
@@ -29,7 +38,7 @@ export function Header() {
         <span>
           Data as-of{" "}
           <span className="text-foreground font-medium">
-            {getDataAsOfTimestamp()}
+            {timestamp ?? "Loading..."}
           </span>
         </span>
         <span className="w-px h-3 bg-border" />
@@ -57,7 +66,7 @@ export function Header() {
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>{theme === "dark" ? "Ivory Ledger" : "Obsidian Ledger"}</p>
+              <p>{mounted ? (theme === "dark" ? "Ivory Ledger" : "Obsidian Ledger") : "Toggle theme"}</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
