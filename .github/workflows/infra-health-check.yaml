@@ -1,0 +1,118 @@
+name: Infrastructure Health Check
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'  # Every 30 minutes
+  workflow_dispatch:  # Manual trigger
+
+# Required for OIDC authentication
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to Azure (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Check and Start PostgreSQL
+        run: |
+          STATE=$(az postgres flexible-server show --name aistartupstr --resource-group aistartupstr --query state -o tsv)
+          echo "PostgreSQL state: $STATE"
+          if [ "$STATE" != "Ready" ]; then
+            echo "::warning::PostgreSQL is $STATE, starting..."
+            az postgres flexible-server start --name aistartupstr --resource-group aistartupstr
+            echo "PostgreSQL start command issued"
+          else
+            echo "PostgreSQL is running"
+          fi
+
+      - name: Check and Start AKS
+        run: |
+          STATE=$(az aks show --resource-group rg-fund-rag --name aks-fund-rag --query powerState.code -o tsv)
+          echo "AKS power state: $STATE"
+          if [ "$STATE" != "Running" ]; then
+            echo "::warning::AKS is $STATE, starting..."
+            az aks start --resource-group rg-fund-rag --name aks-fund-rag
+            echo "AKS start command issued"
+          else
+            echo "AKS is running"
+          fi
+
+      - name: Wait for services to stabilize
+        run: |
+          echo "Waiting 60 seconds for services to stabilize..."
+          sleep 60
+
+      - name: Get AKS credentials and verify pods
+        run: |
+          az aks get-credentials --resource-group rg-fund-rag --name aks-fund-rag --overwrite-existing
+          echo "Checking pods in fund-rag namespace..."
+          kubectl get pods -n fund-rag
+
+          # Check if any pods are not running
+          NOT_RUNNING=$(kubectl get pods -n fund-rag --no-headers | grep -v Running | wc -l)
+          if [ "$NOT_RUNNING" -gt 0 ]; then
+            echo "::warning::Some pods are not in Running state"
+            kubectl get pods -n fund-rag
+          fi
+
+      - name: Test backend health endpoint
+        run: |
+          # Get internal LoadBalancer IP
+          INTERNAL_IP=$(kubectl get svc fund-rag-backend-internal -n fund-rag -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+          echo "Internal LoadBalancer IP: $INTERNAL_IP"
+
+          # Test via public LoadBalancer since we can't reach internal from GitHub runner
+          PUBLIC_IP=$(kubectl get svc fund-rag-backend-lb -n fund-rag -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+          echo "Public LoadBalancer IP: $PUBLIC_IP"
+
+          if [ -n "$PUBLIC_IP" ]; then
+            echo "Testing health endpoint via public LB..."
+            HEALTH=$(curl -s -o /dev/null -w "%{http_code}" "http://$PUBLIC_IP/health" --connect-timeout 10 || echo "failed")
+            if [ "$HEALTH" = "200" ]; then
+              echo "Backend health check passed"
+            else
+              echo "::error::Backend health check failed with status: $HEALTH"
+              exit 1
+            fi
+          else
+            echo "::warning::No public LoadBalancer IP available, skipping health check"
+          fi
+
+      - name: Test PII container
+        run: |
+          echo "Testing PII container..."
+          RESPONSE=$(curl -s -X POST "http://pii-ozguler.eastus.azurecontainer.io:5000/language/:analyze-text?api-version=2023-04-01" \
+            -H "Content-Type: application/json" \
+            -d '{"kind":"PiiEntityRecognition","parameters":{"modelVersion":"latest"},"analysisInput":{"documents":[{"id":"1","language":"en","text":"test"}]}}' \
+            --connect-timeout 10 || echo '{"error":"timeout"}')
+
+          if echo "$RESPONSE" | grep -q "error"; then
+            echo "::warning::PII container may be unavailable"
+            echo "$RESPONSE"
+          else
+            echo "PII container is responding"
+          fi
+
+      - name: Summary
+        run: |
+          echo "## Infrastructure Health Check Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Component | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
+
+          PG_STATE=$(az postgres flexible-server show --name aistartupstr --resource-group aistartupstr --query state -o tsv)
+          AKS_STATE=$(az aks show --resource-group rg-fund-rag --name aks-fund-rag --query powerState.code -o tsv)
+
+          echo "| PostgreSQL | $PG_STATE |" >> $GITHUB_STEP_SUMMARY
+          echo "| AKS Cluster | $AKS_STATE |" >> $GITHUB_STEP_SUMMARY
+
+          POD_COUNT=$(kubectl get pods -n fund-rag --no-headers | grep Running | wc -l)
+          echo "| Backend Pods | $POD_COUNT running |" >> $GITHUB_STEP_SUMMARY
