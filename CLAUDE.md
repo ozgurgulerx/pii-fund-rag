@@ -631,3 +631,125 @@ The frontend deploys automatically when these paths change:
 - `src/tailwind.config.ts`
 
 Or manually via `workflow_dispatch`.
+
+---
+
+## Current Working State (Checkpoint: 2026-01-29)
+
+### Git Checkpoint
+```bash
+# Tag for known working state
+git tag: checkpoint-2026-01-29
+git commit: 33e9314
+
+# To restore if anything breaks:
+git checkout checkpoint-2026-01-29
+```
+
+### Verified Working Endpoints
+
+| Endpoint | Test Command | Expected Result |
+|----------|--------------|-----------------|
+| Frontend | `curl https://fundrag-frontend.azurewebsites.net` | HTML page |
+| PII (clean) | `curl -X POST https://fundrag-frontend.azurewebsites.net/api/pii -H "Content-Type: application/json" -d '{"text":"hello"}'` | `{"blocked":false}` |
+| PII (blocked) | `curl -X POST https://fundrag-frontend.azurewebsites.net/api/pii -H "Content-Type: application/json" -d '{"text":"SSN 123-45-6789"}'` | `{"blocked":true,"detectedCategories":["USSocialSecurityNumber"]}` |
+| Chat | `curl -X POST https://fundrag-frontend.azurewebsites.net/api/chat -H "Content-Type: application/json" -d '{"messages":[{"role":"user","content":"Top 3 funds"}]}'` | SSE stream with fund data |
+
+### Infrastructure Health Check Workflow
+
+A GitHub Actions workflow runs every 30 minutes to monitor and auto-recover infrastructure:
+- **File:** `.github/workflows/infra-health-check.yaml`
+- **Schedule:** `*/30 * * * *` (every 30 minutes)
+- **Actions:** Checks AKS and PostgreSQL, auto-starts if stopped
+
+**Known Issue:** The health check shows a permission error for PostgreSQL because the service principal only has access to `rg-fund-rag`, not `aistartupstr` (where PostgreSQL lives). This doesn't affect the actual system - PostgreSQL works fine via database credentials.
+
+---
+
+## WHEN SYSTEM IS DOWN - Quick Diagnosis
+
+### Step 1: Identify What's Broken
+
+```bash
+# Test each component
+curl -s https://fundrag-frontend.azurewebsites.net/api/pii -X POST \
+  -H "Content-Type: application/json" -d '{"text":"test"}'
+
+# If this fails → Frontend or PII container issue
+# If returns {"blocked":false} → Frontend + PII working, check backend
+```
+
+### Step 2: Check Infrastructure Status
+
+```bash
+# Check if AKS is running
+az aks show --resource-group rg-fund-rag --name aks-fund-rag --query powerState.code -o tsv
+# Should return: Running
+
+# Check if PostgreSQL is running
+az postgres flexible-server show --name aistartupstr --resource-group aistartupstr --query state -o tsv
+# Should return: Ready
+
+# Check AKS pods
+az aks get-credentials --resource-group rg-fund-rag --name aks-fund-rag --overwrite-existing
+kubectl get pods -n fund-rag
+# Should show 2 pods in Running state
+```
+
+### Step 3: Start Stopped Services
+
+```bash
+# Start PostgreSQL (if stopped)
+az postgres flexible-server start --name aistartupstr --resource-group aistartupstr
+
+# Start AKS (if stopped)
+az aks start --resource-group rg-fund-rag --name aks-fund-rag
+
+# Wait 2-3 minutes for AKS to fully start, then refresh credentials
+az aks get-credentials --resource-group rg-fund-rag --name aks-fund-rag --overwrite-existing
+kubectl get pods -n fund-rag
+```
+
+### Step 4: Verify Services After Recovery
+
+```bash
+# Check internal LoadBalancer IP
+kubectl get svc fund-rag-backend-internal -n fund-rag
+# Should show EXTERNAL-IP: 10.0.0.10
+
+# Test backend health
+kubectl exec -n fund-rag deployment/fund-rag-backend -- curl -s localhost:5001/health
+# Should return: {"service":"fund-rag-api","status":"ok"}
+
+# Test full flow
+curl -s https://fundrag-frontend.azurewebsites.net/api/chat \
+  -X POST -H "Content-Type: application/json" \
+  -d '{"messages":[{"role":"user","content":"Top 3 funds"}]}' | head -20
+```
+
+---
+
+## Resource Groups and Permissions
+
+| Resource | Resource Group | Notes |
+|----------|----------------|-------|
+| AKS Cluster | `rg-fund-rag` | GitHub Actions has Contributor access |
+| App Service | `rg-fund-rag` | GitHub Actions has Contributor access |
+| VNet/Subnets | `rg-fund-rag` | GitHub Actions has Contributor access |
+| PostgreSQL | `aistartupstr` | **Different RG** - no GitHub Actions access |
+| AI Search | `aistartupstr` | **Different RG** |
+| Azure OpenAI | `aistartupstr` | **Different RG** |
+| PII Container | `pii-ozguler` (ACI) | East US region |
+
+This is why the health check workflow can monitor AKS but not PostgreSQL.
+
+---
+
+## Prompt Files for Replicating This Project
+
+| Purpose | File Path |
+|---------|-----------|
+| Frontend Styling | `docs/STYLING_PROMPT.md` |
+| Azure Infrastructure | Use plan file or recreate from CLAUDE.md |
+
+These prompts can be used to set up similar projects with the same styling and infrastructure patterns.
