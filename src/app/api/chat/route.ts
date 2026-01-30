@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               message: query,
-              use_llm_routing: false,  // Use fast heuristic routing (LLM routing adds 2-4s)
+              use_llm_routing: true,  // Use LLM routing for accurate path detection
               retrieval_mode: retrievalMode,
             }),
           });
