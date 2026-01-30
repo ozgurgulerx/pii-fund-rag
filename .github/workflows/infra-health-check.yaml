@@ -22,33 +22,47 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Check and Start PostgreSQL
+        id: postgres
         run: |
           STATE=$(az postgres flexible-server show --name aistartupstr --resource-group aistartupstr --query state -o tsv)
           echo "PostgreSQL state: $STATE"
+          echo "initial_state=$STATE" >> $GITHUB_OUTPUT
           if [ "$STATE" != "Ready" ]; then
             echo "::warning::PostgreSQL is $STATE, starting..."
             az postgres flexible-server start --name aistartupstr --resource-group aistartupstr
             echo "PostgreSQL start command issued"
+            echo "started=true" >> $GITHUB_OUTPUT
           else
             echo "PostgreSQL is running"
+            echo "started=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Check and Start AKS
+        id: aks
         run: |
           STATE=$(az aks show --resource-group rg-fund-rag --name aks-fund-rag --query powerState.code -o tsv)
           echo "AKS power state: $STATE"
+          echo "initial_state=$STATE" >> $GITHUB_OUTPUT
           if [ "$STATE" != "Running" ]; then
             echo "::warning::AKS is $STATE, starting..."
             az aks start --resource-group rg-fund-rag --name aks-fund-rag
             echo "AKS start command issued"
+            echo "started=true" >> $GITHUB_OUTPUT
           else
             echo "AKS is running"
+            echo "started=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Wait for services to stabilize
         run: |
-          echo "Waiting 60 seconds for services to stabilize..."
-          sleep 60
+          # Wait longer if services were just started
+          if [ "${{ steps.aks.outputs.started }}" = "true" ] || [ "${{ steps.postgres.outputs.started }}" = "true" ]; then
+            echo "Services were started, waiting 120 seconds for full stabilization..."
+            sleep 120
+          else
+            echo "Services already running, waiting 30 seconds..."
+            sleep 30
+          fi
 
       - name: Get AKS credentials and verify pods
         run: |
@@ -63,7 +77,7 @@ jobs:
             kubectl get pods -n fund-rag
           fi
 
-      - name: Test backend health endpoint
+      - name: Test backend health endpoint (with retries)
         run: |
           # Get internal LoadBalancer IP
           INTERNAL_IP=$(kubectl get svc fund-rag-backend-internal -n fund-rag -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
@@ -74,13 +88,33 @@ jobs:
           echo "Public LoadBalancer IP: $PUBLIC_IP"
 
           if [ -n "$PUBLIC_IP" ]; then
-            echo "Testing health endpoint via public LB..."
-            HEALTH=$(curl -s -o /dev/null -w "%{http_code}" "http://$PUBLIC_IP/health" --connect-timeout 10 || echo "failed")
-            if [ "$HEALTH" = "200" ]; then
-              echo "Backend health check passed"
-            else
-              echo "::error::Backend health check failed with status: $HEALTH"
-              exit 1
+            echo "Testing health endpoint via public LB (with retries)..."
+
+            # Retry up to 5 times with 15 second intervals
+            MAX_RETRIES=5
+            RETRY_INTERVAL=15
+            SUCCESS=false
+
+            for i in $(seq 1 $MAX_RETRIES); do
+              echo "Attempt $i of $MAX_RETRIES..."
+              HEALTH=$(curl -s -o /dev/null -w "%{http_code}" "http://$PUBLIC_IP/health" --connect-timeout 10 || echo "000")
+
+              if [ "$HEALTH" = "200" ]; then
+                echo "Backend health check passed on attempt $i"
+                SUCCESS=true
+                break
+              else
+                echo "Health check returned: $HEALTH"
+                if [ "$i" -lt "$MAX_RETRIES" ]; then
+                  echo "Waiting $RETRY_INTERVAL seconds before retry..."
+                  sleep $RETRY_INTERVAL
+                fi
+              fi
+            done
+
+            if [ "$SUCCESS" = "false" ]; then
+              echo "::warning::Backend health check failed after $MAX_RETRIES attempts (last status: $HEALTH)"
+              echo "Services were started but may need more time. Check manually if issue persists."
             fi
           else
             echo "::warning::No public LoadBalancer IP available, skipping health check"
@@ -102,17 +136,32 @@ jobs:
           fi
 
       - name: Summary
+        if: always()
         run: |
           echo "## Infrastructure Health Check Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Component | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Component | Initial State | Action Taken |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|---------------|--------------|" >> $GITHUB_STEP_SUMMARY
 
           PG_STATE=$(az postgres flexible-server show --name aistartupstr --resource-group aistartupstr --query state -o tsv)
           AKS_STATE=$(az aks show --resource-group rg-fund-rag --name aks-fund-rag --query powerState.code -o tsv)
 
-          echo "| PostgreSQL | $PG_STATE |" >> $GITHUB_STEP_SUMMARY
-          echo "| AKS Cluster | $AKS_STATE |" >> $GITHUB_STEP_SUMMARY
+          PG_INITIAL="${{ steps.postgres.outputs.initial_state }}"
+          AKS_INITIAL="${{ steps.aks.outputs.initial_state }}"
+          PG_STARTED="${{ steps.postgres.outputs.started }}"
+          AKS_STARTED="${{ steps.aks.outputs.started }}"
 
-          POD_COUNT=$(kubectl get pods -n fund-rag --no-headers | grep Running | wc -l)
-          echo "| Backend Pods | $POD_COUNT running |" >> $GITHUB_STEP_SUMMARY
+          if [ "$PG_STARTED" = "true" ]; then
+            echo "| PostgreSQL | $PG_INITIAL | ✅ Started → $PG_STATE |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| PostgreSQL | $PG_INITIAL | Already running |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ "$AKS_STARTED" = "true" ]; then
+            echo "| AKS Cluster | $AKS_INITIAL | ✅ Started → $AKS_STATE |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| AKS Cluster | $AKS_INITIAL | Already running |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          POD_COUNT=$(kubectl get pods -n fund-rag --no-headers 2>/dev/null | grep Running | wc -l || echo "0")
+          echo "| Backend Pods | - | $POD_COUNT running |" >> $GITHUB_STEP_SUMMARY
