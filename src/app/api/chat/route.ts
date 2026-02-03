@@ -22,7 +22,7 @@ function createSSEMessage(data: unknown): string {
   return `data: ${JSON.stringify(data)}\n\n`;
 }
 
-// Helper to stream result data to client (used for both JSON and NDJSON responses)
+// Helper to stream backend JSON result to client via SSE (word-by-word for typing effect)
 async function streamResultToClient(
   controller: ReadableStreamDefaultController,
   data: {
@@ -174,58 +174,7 @@ export async function POST(request: NextRequest) {
             throw new Error(`Python API error: ${response.status}`);
           }
 
-          const contentType = response.headers.get("content-type") || "";
-
-          // Handle NDJSON streaming response (CHAIN queries with progress)
-          if (contentType.includes("application/x-ndjson")) {
-            const reader = response.body?.getReader();
-            if (!reader) {
-              throw new Error("No response body reader");
-            }
-
-            const decoder = new TextDecoder();
-            let buffer = "";
-
-            while (true) {
-              const { done, value } = await reader.read();
-              if (done) break;
-
-              buffer += decoder.decode(value, { stream: true });
-              const lines = buffer.split("\n");
-              buffer = lines.pop() || ""; // Keep incomplete line in buffer
-
-              for (const line of lines) {
-                if (!line.trim()) continue;
-
-                try {
-                  const event = JSON.parse(line);
-
-                  if (event.type === "progress") {
-                    // Forward progress event to frontend
-                    controller.enqueue(
-                      encoder.encode(
-                        createSSEMessage({
-                          type: "progress",
-                          stage: event.stage,
-                          message: event.message,
-                        })
-                      )
-                    );
-                  } else if (event.type === "result") {
-                    // Handle final result same as regular JSON response
-                    await streamResultToClient(controller, event);
-                  }
-                } catch (parseError) {
-                  console.error("Error parsing NDJSON line:", line, parseError);
-                }
-              }
-            }
-
-            controller.close();
-            return;
-          }
-
-          // Handle regular JSON response (non-CHAIN queries)
+          // Backend always returns JSON - stream it to client via SSE
           const data = await response.json();
           await streamResultToClient(controller, data);
           controller.close();
