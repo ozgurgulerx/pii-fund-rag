@@ -11,7 +11,8 @@ import {
   GitBranch,
   Globe,
   ChevronRight,
-  ArrowRight
+  ArrowRight,
+  CheckCircle,
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Message } from "./message";
@@ -22,6 +23,7 @@ interface ChatThreadProps {
   messages: MessageType[];
   isLoading: boolean;
   streamingContent?: string;
+  queryProgress?: { stage: string; message: string }[];
   onCitationClick?: (id: number) => void;
   activeCitationId?: number | null;
   onSendMessage?: (message: string) => void;
@@ -79,6 +81,7 @@ export function ChatThread({
   messages,
   isLoading,
   streamingContent,
+  queryProgress = [],
   onCitationClick,
   activeCitationId,
   onSendMessage,
@@ -141,14 +144,39 @@ export function ChatThread({
                 </div>
                 <div className="flex-1 max-w-[85%]">
                   <div className="rounded-xl px-4 py-3 bg-surface-2 border border-border">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <span>Analyzing fund data</span>
-                      <span className="flex gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-gold animate-bounce" style={{ animationDelay: "0ms" }} />
-                        <span className="w-1.5 h-1.5 rounded-full bg-gold animate-bounce" style={{ animationDelay: "150ms" }} />
-                        <span className="w-1.5 h-1.5 rounded-full bg-gold animate-bounce" style={{ animationDelay: "300ms" }} />
-                      </span>
-                    </div>
+                    {queryProgress.length > 0 ? (
+                      /* Progress steps for CHAIN queries */
+                      <div className="flex flex-col gap-2">
+                        {queryProgress.map((p, i) => (
+                          <motion.div
+                            key={`${p.stage}-${i}`}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="flex items-center gap-2 text-sm"
+                          >
+                            {i === queryProgress.length - 1 ? (
+                              <Loader2 className="h-4 w-4 text-amber-500 animate-spin flex-shrink-0" />
+                            ) : (
+                              <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                            )}
+                            <span className={i === queryProgress.length - 1 ? "text-foreground" : "text-muted-foreground"}>
+                              {p.message}
+                            </span>
+                          </motion.div>
+                        ))}
+                      </div>
+                    ) : (
+                      /* Default loading indicator */
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <span>Analyzing fund data</span>
+                        <span className="flex gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-gold animate-bounce" style={{ animationDelay: "0ms" }} />
+                          <span className="w-1.5 h-1.5 rounded-full bg-gold animate-bounce" style={{ animationDelay: "150ms" }} />
+                          <span className="w-1.5 h-1.5 rounded-full bg-gold animate-bounce" style={{ animationDelay: "300ms" }} />
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </motion.div>

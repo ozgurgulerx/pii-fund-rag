@@ -43,6 +43,7 @@ export default function ChatPage() {
   // Streaming state
   const [isLoading, setIsLoading] = useState(false);
   const [streamingContent, setStreamingContent] = useState("");
+  const [queryProgress, setQueryProgress] = useState<{stage: string; message: string}[]>([]);
 
   // Show follow-ups after assistant response
   const [showFollowUps, setShowFollowUps] = useState(true);
@@ -87,6 +88,7 @@ export default function ChatPage() {
     setMessages((prev) => [...prev, userMessage]);
     setIsLoading(true);
     setStreamingContent("");
+    setQueryProgress([]);  // Reset progress for new query
     setShowFollowUps(false);
 
     try {
@@ -127,6 +129,10 @@ export default function ChatPage() {
               const data = JSON.parse(line.slice(6));
 
               switch (data.type) {
+                case "progress":
+                  // Add progress update for CHAIN queries
+                  setQueryProgress((prev) => [...prev, { stage: data.stage, message: data.message }]);
+                  break;
                 case "text":
                   fullContent += data.content;
                   setStreamingContent(fullContent);
@@ -191,6 +197,7 @@ export default function ChatPage() {
     } finally {
       setIsLoading(false);
       setStreamingContent("");
+      setQueryProgress([]);  // Clear progress when done
     }
   }, [messages, retrievalMode]);
 
@@ -237,6 +244,7 @@ export default function ChatPage() {
             messages={messages}
             isLoading={isLoading}
             streamingContent={streamingContent}
+            queryProgress={queryProgress}
             onCitationClick={handleCitationClick}
             activeCitationId={activeCitationId}
             onSendMessage={handleSendMessage}
